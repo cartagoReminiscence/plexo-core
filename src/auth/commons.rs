@@ -1,4 +1,4 @@
-use super::auth::PlexoAuthToken;
+use super::resources::PlexoAuthToken;
 use cookie::Cookie;
 use reqwest::header::HeaderMap;
 

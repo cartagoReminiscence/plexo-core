@@ -12,34 +12,19 @@ use poem::web::{Data, Json, Query, Redirect};
 use poem::{handler, Body, IntoResponse, Response, Result};
 use reqwest::header::{CACHE_CONTROL, EXPIRES, LOCATION, PRAGMA, SET_COOKIE};
 use reqwest::StatusCode;
-use serde::{Deserialize, Serialize};
+
 use serde_json::{json, Value};
 
-use crate::core::core::Core;
+use crate::core::app::Core;
 use crate::errors::app::PlexoAppError;
 
-use super::commons::{
-    get_token_from_cookie, get_token_from_headers, COOKIE_SESSION_TOKEN_NAME, GITHUB_USER_API,
+use super::resources::PlexoAuthToken;
+use super::{
+    commons::{
+        get_token_from_cookie, get_token_from_headers, COOKIE_SESSION_TOKEN_NAME, GITHUB_USER_API,
+    },
+    resources::{EmailLoginParams, EmailRegisterParams, GithubCallbackParams},
 };
-
-// use crate::commons::authorization::{get_token_from_cookie, get_token_from_headers};
-// use crate::errors::definitions::PlexoAppError;
-// use crate::system::core::Engine;
-
-#[derive(Debug, Deserialize)]
-pub struct GithubCallbackParams {
-    code: String,
-    state: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AuthenticationResponse {
-    access_token: String,
-    token_type: Option<String>,
-    scope: Option<String>,
-}
-
-pub struct PlexoAuthToken(pub String);
 
 #[handler]
 pub async fn github_sign_in_handler(plexo_core: Data<&Core>) -> impl IntoResponse {
@@ -180,12 +165,6 @@ pub fn logout() -> impl IntoResponse {
         .into_response()
 }
 
-#[derive(Debug, Deserialize)]
-pub struct EmailLoginParams {
-    pub email: String,
-    pub password: String,
-}
-
 #[handler]
 pub async fn email_basic_login_handler(
     plexo_engine: Data<&Core>,
@@ -256,13 +235,6 @@ pub async fn email_basic_login_handler(
         .header(SET_COOKIE, session_token_cookie.to_string())
         .header("Content-Type", "application/json")
         .body(Body::from_json(json!({ "access_token": session_token })).unwrap())
-}
-
-#[derive(Debug, Deserialize)]
-pub struct EmailRegisterParams {
-    pub email: String,
-    pub name: String,
-    pub password: String,
 }
 
 fn _get_token(headers: &HeaderMap) -> Result<PlexoAuthToken, PlexoAppError> {

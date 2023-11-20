@@ -12,8 +12,8 @@ use oauth2::{
 use reqwest::Url;
 
 use super::{
-    auth::PlexoAuthToken,
     jwt::{JWTEngine, PlexoAuthTokenClaims},
+    resources::PlexoAuthToken,
 };
 
 #[derive(Clone)]

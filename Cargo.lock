@@ -1785,6 +1785,7 @@ dependencies = [
  "async-graphql",
  "chrono",
  "cookie 0.18.0",
+ "dotenv",
  "jsonwebtoken",
  "oauth2",
  "plexo-sdk",
@@ -1799,9 +1800,9 @@ dependencies = [
 
 [[package]]
 name = "plexo-sdk"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b73b6b81437e806efe85a3c9e9a9dbfbf27e39430711cc6895b4bbfbc4f170f9"
+checksum = "8b3ba017e92858f7c5a5d08435d8aaaaf7da447ac7e1af272f6bde9737c1cbc8"
 dependencies = [
  "async-graphql",
  "async-trait",

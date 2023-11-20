@@ -1,7 +1,7 @@
 use async_graphql::{Context, Result};
 use uuid::Uuid;
 
-use crate::{auth::auth::PlexoAuthToken, core::core::Core, errors::app::PlexoAppError};
+use crate::{auth::resources::PlexoAuthToken, core::app::Core, errors::app::PlexoAppError};
 
 pub fn extract_context(ctx: &Context<'_>) -> Result<(Core, Uuid)> {
     let Ok(auth_token) = &ctx.data::<PlexoAuthToken>() else {

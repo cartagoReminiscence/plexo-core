@@ -1,7 +1,7 @@
-use async_graphql::{dataloader::DataLoader, MergedObject, Schema};
+use async_graphql::{MergedObject, Schema};
 // use plexo_sdk::backend::engine::Engine;
 
-use super::tasks::TasksGraphQLQuery;
+use super::queries::tasks::TasksGraphQLQuery;
 
 #[derive(MergedObject, Default)]
 pub struct QueryRoot(TasksGraphQLQuery);
