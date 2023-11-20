@@ -1,8 +1,8 @@
+use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, InputObject, Object, Result};
 use chrono::{DateTime, Utc};
 use plexo_sdk::tasks::task::{Task, TaskPriority, TaskStatus};
 use uuid::Uuid;
-
 #[derive(Default)]
 pub struct TasksGraphQLQuery;
 
@@ -19,6 +19,8 @@ pub struct TaskFilter {
 #[Object]
 impl TasksGraphQLQuery {
     async fn tasks(&self, ctx: &Context<'_>, _filter: Option<TaskFilter>) -> Result<Vec<Task>> {
+        let (_plexo_engine, _member_id) = extract_context(ctx)?;
+
         todo!()
     }
 }
