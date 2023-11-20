@@ -209,6 +209,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-graphql-poem"
+version = "6.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c665e1051f0c73fdb2f143a341c531249aedd35473d0f5d8e6e32627502f45cd"
+dependencies = [
+ "async-graphql",
+ "futures-util",
+ "mime",
+ "poem",
+ "serde_json",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+]
+
+[[package]]
 name = "async-graphql-value"
 version = "6.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -647,6 +663,12 @@ dependencies = [
  "quote",
  "syn 2.0.39",
 ]
+
+[[package]]
+name = "data-encoding"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2e66c9d817f1720209181c316d28635c050fa304f9c79e47a520882661b7308"
 
 [[package]]
 name = "der"
@@ -1391,6 +1413,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
+name = "mime_guess"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4192263c238a5f0d0c6bfd21f336a313a4ce1c450542449ca191bb657b4642ef"
+dependencies = [
+ "mime",
+ "unicase",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1783,18 +1815,23 @@ version = "0.1.0"
 dependencies = [
  "argon2",
  "async-graphql",
+ "async-graphql-poem",
  "chrono",
  "cookie 0.18.0",
  "dotenv",
+ "futures-util",
  "jsonwebtoken",
+ "lazy_static",
  "oauth2",
  "plexo-sdk",
  "poem",
+ "poem-openapi",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror",
  "tokio",
+ "tokio-stream",
  "uuid",
 ]
 
@@ -1826,14 +1863,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "504774c97b0744c1ee108a37e5a65a9745a4725c4c06277521dabc28eb53a904"
 dependencies = [
  "async-trait",
+ "base64 0.21.5",
  "bytes",
  "chrono",
  "cookie 0.17.0",
  "futures-util",
  "headers",
  "http",
+ "httpdate",
  "hyper",
  "mime",
+ "mime_guess",
  "multer",
  "nix",
  "parking_lot",
@@ -1853,6 +1893,7 @@ dependencies = [
  "time",
  "tokio",
  "tokio-stream",
+ "tokio-tungstenite",
  "tokio-util",
  "tracing",
  "wildmatch",
@@ -3028,6 +3069,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-tungstenite"
+version = "0.20.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "212d5dcb2a1ce06d81107c3d0ffa3121fe974b73f068c8282cb1c32328113b6c"
+dependencies = [
+ "futures-util",
+ "log",
+ "tokio",
+ "tungstenite",
+]
+
+[[package]]
 name = "tokio-util"
 version = "0.7.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3035,6 +3088,7 @@ checksum = "5419f34732d9eb6ee4c3578b7989078579b7f039cbbb9ca2c4da015749371e15"
 dependencies = [
  "bytes",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "pin-project-lite",
  "tokio",
@@ -3114,6 +3168,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3528ecfd12c466c6f163363caf2d02a71161dd5e1cc6ae7b34207ea2d42d81ed"
 
 [[package]]
+name = "tungstenite"
+version = "0.20.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e3dac10fd62eaf6617d3a904ae222845979aec67c615d1c842b4002c7666fb9"
+dependencies = [
+ "byteorder",
+ "bytes",
+ "data-encoding",
+ "http",
+ "httparse",
+ "log",
+ "rand",
+ "sha1",
+ "thiserror",
+ "url",
+ "utf-8",
+]
+
+[[package]]
 name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3130,6 +3203,15 @@ name = "uncased"
 version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b9bc53168a4be7402ab86c3aad243a84dd7381d09be0eddc81280c1da95ca68"
+dependencies = [
+ "version_check",
+]
+
+[[package]]
+name = "unicase"
+version = "2.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7d2d4dafb69621809a81864c9c1b864479e1235c0dd4e199924b9742439ed89"
 dependencies = [
  "version_check",
 ]
@@ -3200,6 +3282,12 @@ dependencies = [
  "percent-encoding",
  "serde",
 ]
+
+[[package]]
+name = "utf-8"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
 
 [[package]]
 name = "uuid"

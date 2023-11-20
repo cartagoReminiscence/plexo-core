@@ -1,4 +1,4 @@
 pub mod commons;
 pub mod loaders;
-pub mod queries;
+pub mod operations;
 pub mod schema;
