@@ -3,13 +3,16 @@ use async_graphql::{MergedObject, MergedSubscription, Schema};
 
 use crate::core::app::Core;
 
-use super::operations::tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription};
+use super::{
+    auth::AuthMutation,
+    operations::tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
+};
 
 #[derive(MergedObject, Default)]
 pub struct QueryRoot(TasksGraphQLQuery);
 
 #[derive(MergedObject, Default)]
-pub struct MutationRoot(TasksGraphQLMutation);
+pub struct MutationRoot(TasksGraphQLMutation, AuthMutation);
 
 #[derive(MergedSubscription, Default)]
 pub struct SubscriptionRoot(TasksGraphQLSubscription);

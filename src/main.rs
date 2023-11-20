@@ -7,7 +7,7 @@ use plexo_core::{
         email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler,
     },
     core::{
-        app::new_from_env,
+        app::new_core_from_env,
         config::{DOMAIN, URL},
     },
     handlers::{graphiq_handler, index_handler, ws_switch_handler},
@@ -18,9 +18,7 @@ use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Rout
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
 
-    // println!("total tasks: {}", tasks.len());
-
-    let core = new_from_env().await?;
+    let core = new_core_from_env().await?;
 
     let graphql_schema = core.graphql_api_schema();
 

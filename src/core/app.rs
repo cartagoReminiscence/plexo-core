@@ -13,7 +13,7 @@ pub struct Core {
     pub auth: AuthEngine,
 }
 
-pub async fn new_from_env() -> Result<Core, PlexoAppError> {
+pub async fn new_core_from_env() -> Result<Core, PlexoAppError> {
     let engine = new_postgres_engine(DATABASE_URL.as_str()).await?;
     let auth = AuthEngine::new(
         (*JWT_ACCESS_TOKEN_SECRET).to_string(),

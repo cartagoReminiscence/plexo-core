@@ -1837,9 +1837,9 @@ dependencies = [
 
 [[package]]
 name = "plexo-sdk"
-version = "0.2.3"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b3ba017e92858f7c5a5d08435d8aaaaf7da447ac7e1af272f6bde9737c1cbc8"
+checksum = "44283cc3d27eec62303f0be9b3530fefd9f31c9640b1966281dc7f87df8487b0"
 dependencies = [
  "async-graphql",
  "async-trait",
