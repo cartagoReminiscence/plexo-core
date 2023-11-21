@@ -1,12 +1,14 @@
 use chrono::Utc;
-use jsonwebtoken::{decode, encode, errors::Error, DecodingKey, EncodingKey, Header};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header};
 use plexo_sdk::members::member::Member;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::errors::app::PlexoAppError;
+
 // use crate::sdk::member::Member;
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct JWTEngine {
     access_token_secret: String,
     // refresh_token_secret: String,
@@ -34,7 +36,7 @@ impl JWTEngine {
         }
     }
 
-    pub fn create_session_token(&self, member: &Member) -> Result<String, Error> {
+    pub fn create_session_token(&self, member: &Member) -> Result<String, PlexoAppError> {
         let claims = PlexoAuthTokenClaims {
             iss: "Plexo".to_string(),
             aud: "session.plexo.app".to_string(),
@@ -51,7 +53,7 @@ impl JWTEngine {
         Ok(token)
     }
 
-    pub fn decode_session_token(&self, token: &str) -> Result<PlexoAuthTokenClaims, Error> {
+    pub fn decode_session_token(&self, token: &str) -> Result<PlexoAuthTokenClaims, PlexoAppError> {
         let token_data = decode::<PlexoAuthTokenClaims>(
             token,
             &DecodingKey::from_secret(self.access_token_secret.as_ref()),

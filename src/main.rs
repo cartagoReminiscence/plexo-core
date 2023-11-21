@@ -2,7 +2,7 @@ use std::error::Error;
 
 use dotenv::dotenv;
 use plexo_core::{
-    api::graphql::schema::GraphQLSchema,
+    api::{graphql::schema::GraphQLSchema, openapi::api::PlexoOpenAPI},
     auth::handlers::{
         email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler,
     },
@@ -13,6 +13,7 @@ use plexo_core::{
     handlers::{graphiq_handler, index_handler, ws_switch_handler},
 };
 use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Route, Server};
+use poem_openapi::OpenApiService;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -22,9 +23,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let graphql_schema = core.graphql_api_schema();
 
+    let api_service = OpenApiService::new(PlexoOpenAPI::new(core.clone()), "Plexo Open API", "1.0")
+        .server("http://localhost:3000/api");
+
+    let ui = api_service.swagger_ui();
+    // let server_key = Hmac::<Sha256>::new_from_slice(SERVER_KEY).expect("valid server key");
+
     let app = Route::new()
-        // .nest("/api", api_service)
-        // .nest("/", ui)
+        .nest("/api", api_service)
+        .nest("/", ui)
         // .nest("/", static_page)
         // Non authenticated routes
         .at("/auth/email/login", post(email_basic_login_handler))

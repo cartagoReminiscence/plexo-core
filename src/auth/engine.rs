@@ -11,6 +11,8 @@ use oauth2::{
 
 use reqwest::Url;
 
+use crate::errors::app::PlexoAppError;
+
 use super::{
     jwt::{JWTEngine, PlexoAuthTokenClaims},
     resources::PlexoAuthToken,
@@ -131,7 +133,7 @@ impl AuthEngine {
     pub fn extract_claims(
         &self,
         plexo_auth_token: &PlexoAuthToken,
-    ) -> Result<PlexoAuthTokenClaims, Box<dyn Error>> {
+    ) -> Result<PlexoAuthTokenClaims, PlexoAppError> {
         Ok(self
             .jwt_engine
             .decode_session_token(plexo_auth_token.0.as_str())?)

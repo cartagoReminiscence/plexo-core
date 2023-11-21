@@ -19,7 +19,7 @@ impl TasksGraphQLQuery {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_tasks(input.unwrap_or(GetTasksInputBuilder::default().build()?))
+            .get_tasks(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
@@ -39,10 +39,10 @@ pub struct TasksGraphQLMutation;
 
 #[Object]
 impl TasksGraphQLMutation {
-    async fn create_task(&self, ctx: &Context<'_>, input: CreateTaskInput) -> Result<Task> {
+    // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
+    async fn create_task(&self, ctx: &Context<'_>, mut input: CreateTaskInput) -> Result<Task> {
         let (core, member_id) = extract_context(ctx)?;
 
-        let mut input = input;
         input.owner_id = member_id;
 
         core.engine

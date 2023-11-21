@@ -246,7 +246,7 @@ fn _get_token(headers: &HeaderMap) -> Result<PlexoAuthToken, PlexoAppError> {
         return Ok(token);
     }
 
-    Err(PlexoAppError::PoemError(poem::error::NotFoundError))
+    Err(PlexoAppError::NotFoundPoemError(poem::error::NotFoundError))
 }
 
 #[handler]
