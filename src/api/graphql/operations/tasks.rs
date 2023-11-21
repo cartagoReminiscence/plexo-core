@@ -2,9 +2,7 @@ use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::tasks::{
-    operations::{
-        CreateTaskInput, GetTasksInput, GetTasksInputBuilder, TaskCrudOperations, UpdateTaskInput,
-    },
+    operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
     task::Task,
 };
 use tokio_stream::Stream;

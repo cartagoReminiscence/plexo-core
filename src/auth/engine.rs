@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use argon2::{
     password_hash::{rand_core::OsRng, SaltString},
     Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
@@ -134,9 +132,8 @@ impl AuthEngine {
         &self,
         plexo_auth_token: &PlexoAuthToken,
     ) -> Result<PlexoAuthTokenClaims, PlexoAppError> {
-        Ok(self
-            .jwt_engine
-            .decode_session_token(plexo_auth_token.0.as_str())?)
+        self.jwt_engine
+            .decode_session_token(plexo_auth_token.0.as_str())
     }
 
     pub fn validate_password(&self, password: &str, password_hash: &str) -> bool {

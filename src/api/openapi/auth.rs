@@ -43,7 +43,7 @@ impl<'a> poem_openapi::ApiExtractor<'a> for PlexoAPIKeyAuthorization {
             .extensions()
             .get::<poem_openapi::__private::UrlQuery>()
             .unwrap();
-        let output = poem_openapi::__private::CheckerReturn::from(api_checker(&req, <poem_openapi::auth::ApiKey as poem_openapi::auth::ApiKeyAuthorization> ::from_request(req,query,"X-API-Key",poem_openapi::registry::MetaParamIn::Header)?).await).into_result()? ;
+        let output = poem_openapi::__private::CheckerReturn::from(api_checker(req, <poem_openapi::auth::ApiKey as poem_openapi::auth::ApiKeyAuthorization> ::from_request(req,query,"X-API-Key",poem_openapi::registry::MetaParamIn::Header)?).await).into_result()? ;
         ::std::result::Result::Ok(Self(output))
     }
 }

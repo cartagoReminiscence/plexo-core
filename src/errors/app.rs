@@ -1,6 +1,5 @@
 use plexo_sdk::errors::sdk::SDKError;
 use poem::error::ResponseError;
-use std::fmt;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -18,8 +17,6 @@ pub enum PlexoAppError {
     #[error("Email already exists")]
     EmailAlreadyExists,
 
-    #[error("SDKErrorExtended Error")]
-    SDKErrorExtended(#[from] SDKErrorExtended),
     #[error("SDKError error")]
     SDKError(#[from] SDKError),
 
@@ -42,24 +39,6 @@ impl ResponseError for PlexoAppError {
             PlexoAppError::SDKError(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
             PlexoAppError::NotFoundPoemError(_) => reqwest::StatusCode::NOT_FOUND,
             PlexoAppError::JSONWebTokenError(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
-            PlexoAppError::SDKErrorExtended(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
-}
-
-#[derive(Error, Debug)]
-struct SDKErrorExtended(SDKError);
-
-impl fmt::Display for SDKErrorExtended {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.0)
-    }
-}
-
-impl ResponseError for SDKErrorExtended {
-    fn status(&self) -> reqwest::StatusCode {
-        match self.0 {
-            SDKError::SQLXError(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
