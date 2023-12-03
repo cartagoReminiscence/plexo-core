@@ -15,6 +15,7 @@ use reqwest::StatusCode;
 
 use serde_json::{json, Value};
 
+use crate::api::openapi::commons::PlexoOpenAPISpecs;
 use crate::core::app::Core;
 use crate::errors::app::PlexoAppError;
 
@@ -338,4 +339,10 @@ pub async fn logout_handler() -> Result<Response> {
         .header(SET_COOKIE, session_token_cookie.to_string())
         .header("Content-Type", "application/json")
         .body(Body::from_json(json!({ "access_token": "" })).unwrap()))
+}
+
+#[handler]
+
+pub async fn get_open_api_specs(specs: Data<&PlexoOpenAPISpecs>) -> Result<String> {
+    Ok(specs.0.clone().0)
 }

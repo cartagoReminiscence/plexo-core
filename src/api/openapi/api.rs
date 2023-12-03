@@ -20,27 +20,13 @@ use plexo_sdk::{projects::project::Project, tasks::task::Task};
 use poem::Result;
 use poem_openapi::param::Path;
 use poem_openapi::payload::Json;
-use poem_openapi::{ApiResponse, OpenApi, Tags};
+use poem_openapi::{ApiResponse, OpenApi};
 use uuid::Uuid;
 
 use crate::core::app::Core;
 use crate::errors::app::PlexoAppError;
 
-use super::auth::PlexoAPIKeyAuthorization;
-
-#[derive(Tags)]
-enum PlexoAPITags {
-    /// Operations about tasks
-    Task,
-    /// Operations about projects
-    Project,
-    /// Operations about members
-    Member,
-    /// Operations about teams
-    Team,
-    /// Operations about labels
-    Label,
-}
+use super::{auth::PlexoAPIKeyAuthorization, commons::PlexoAPITags};
 
 pub struct PlexoOpenAPI {
     pub core: Core,
@@ -60,6 +46,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "create_task"
     )]
+    /// Creates a new task leveraging Plexo's AI-powered autonomous task generation.
+    /// This function streamlines the planning process by intelligently considering project requirements and team capabilities.
     async fn create_task(
         &self,
         mut input: Json<CreateTaskInput>,
@@ -83,6 +71,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "get_task"
     )]
+    /// Retrieves a specific task, utilizing Plexo's real-time task tracking feature.
+    /// This function aids in monitoring the progress of individual tasks within a project.
     async fn get_task(
         &self,
         id: Path<Uuid>,
@@ -104,6 +94,7 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "get_tasks"
     )]
+
     async fn get_tasks(
         &self,
         input: Json<GetTasksInput>,

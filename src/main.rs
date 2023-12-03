@@ -2,9 +2,13 @@ use std::error::Error;
 
 use dotenv::dotenv;
 use plexo_core::{
-    api::{graphql::schema::GraphQLSchema, openapi::api::PlexoOpenAPI},
+    api::{
+        graphql::schema::GraphQLSchema,
+        openapi::{api::PlexoOpenAPI, commons::PlexoOpenAPISpecs},
+    },
     auth::handlers::{
-        email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler,
+        email_basic_login_handler, get_open_api_specs, github_callback_handler,
+        github_sign_in_handler, logout_handler,
     },
     core::{
         app::new_core_from_env,
@@ -24,14 +28,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let graphql_schema = core.graphql_api_schema();
 
     let api_service = OpenApiService::new(PlexoOpenAPI::new(core.clone()), "Plexo Open API", "1.0")
-        .server("http://localhost:3000/api");
+        .server("http://localhost:8080/api");
 
+    let api_spec = PlexoOpenAPISpecs(api_service.spec());
     let ui = api_service.swagger_ui();
     // let server_key = Hmac::<Sha256>::new_from_slice(SERVER_KEY).expect("valid server key");
 
     let app = Route::new()
         .nest("/api", api_service)
         .nest("/", ui)
+        .at("/openapi.json", get(get_open_api_specs))
         // .nest("/", static_page)
         // Non authenticated routes
         .at("/auth/email/login", post(email_basic_login_handler))
@@ -49,7 +55,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = app
         .with(Cors::new().allow_credentials(true))
         .data(graphql_schema)
-        .data(core.clone());
+        .data(core.clone())
+        .data(api_spec);
 
     println!("Visit GraphQL Playground at {}/playground", *DOMAIN);
 
