@@ -94,7 +94,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "get_tasks"
     )]
-
+    /// Retrieves a list of tasks using Plexo's real-time task tracking feature filtered by the input provided.
+    /// This function helps in monitoring the progress of a specific group of tasks.
     async fn get_tasks(
         &self,
         input: Json<GetTasksInput>,
@@ -116,6 +117,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "update_task"
     )]
+    /// Updates existing information or fields from already created task.
+    /// This function helps to modify the characteristics and update properties of a tasks in relation to the project progress.
     async fn update_task(
         &self,
         id: Path<Uuid>,
@@ -138,6 +141,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Task",
         operation_id = "delete_task"
     )]
+    /// Deletes an existing task in a certain project.
+    /// This function helps in removing a task that is no longer needed within a project.
     async fn delete_task(
         &self,
         id: Path<Uuid>,
