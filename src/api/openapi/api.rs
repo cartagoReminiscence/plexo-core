@@ -164,6 +164,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Project",
         operation_id = "create_project"
     )]
+    /// Creates a new project in Plexo, utilizing the platform's AI-powered tools for efficient project initialization.
+    /// This function allows for setting up the framework of a project, aligning it with team goals and resources.
     async fn create_project(
         &self,
         mut input: Json<CreateProjectInput>,
@@ -187,6 +189,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Project",
         operation_id = "get_project"
     )]
+    /// Retrieves detailed information about a specific project, employing Plexo's real-time tracking and AI analytics.
+    /// This function facilitates in-depth insight into project progress and dynamics.
     async fn get_project(
         &self,
         id: Path<Uuid>,
@@ -208,6 +212,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Project",
         operation_id = "get_projects"
     )]
+    /// Gathers a list of all projects, leveraging Plexo's comprehensive data management and AI insights.
+    /// This function aids in overseeing multiple projects, enhancing strategic decision-making.
     async fn get_projects(
         &self,
         input: Json<GetProjectsInput>,
@@ -230,6 +236,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Project",
         operation_id = "update_project"
     )]
+    /// Updates an existing project's information, aligning with changes in project scope or team structure.
+    /// This function ensures that project details stay current and relevant.
     async fn update_project(
         &self,
         id: Path<Uuid>,
@@ -252,6 +260,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Project",
         operation_id = "delete_project"
     )]
+    /// Removes a project from Plexo's system, maintaining the platform's focus on current and active projects.
+    /// This function is crucial for project lifecycle management and resource allocation optimization.
     async fn delete_project(
         &self,
         id: Path<Uuid>,
@@ -273,6 +283,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Member",
         operation_id = "create_member"
     )]
+    /// Registers a new member in the Plexo system, harnessing the AI capabilities for optimal team integration.
+    /// This function is essential for expanding the team and managing member roles effectively.
     async fn create_member(
         &self,
         input: Json<CreateMemberInput>,
@@ -294,6 +306,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Member",
         operation_id = "get_member"
     )]
+    /// Retrieves detailed information about a specific member, utilizing Plexo's efficient member management system.
+    /// This function aids in understanding individual member contributions and roles within a project.
     async fn get_member(
         &self,
         id: Path<Uuid>,
@@ -315,6 +329,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Member",
         operation_id = "get_members"
     )]
+    /// Gathers a comprehensive list of all members, leveraging Plexo's robust data management capabilities.
+    /// This function enables effective oversight of team composition and individual member roles.
     async fn get_members(
         &self,
         input: Json<GetMembersInput>,
@@ -336,6 +352,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Member",
         operation_id = "update_member"
     )]
+    /// Updates the information of an existing member, aligning their profile with current roles and responsibilities.
+    /// This function ensures member data remains up-to-date and relevant.
     async fn update_member(
         &self,
         id: Path<Uuid>,
@@ -358,6 +376,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Member",
         operation_id = "delete_member"
     )]
+    /// Deletes a member's profile from Plexo, maintaining the accuracy of team composition and project alignment.
+    /// This function is key for managing team dynamics and project resources.
     async fn delete_member(
         &self,
         id: Path<Uuid>,
@@ -379,6 +399,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Team",
         operation_id = "create_team"
     )]
+    /// Creates a new team within Plexo, employing AI-driven insights for optimal team formation and project alignment.
+    /// This function is crucial for structuring teams based on project needs and member skills.
     async fn create_team(
         &self,
         input: Json<CreateTeamInput>,
@@ -400,6 +422,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Team",
         operation_id = "get_team"
     )]
+    /// Retrieves detailed information about a specific team, showcasing Plexo's capability in team management and analytics.
+    /// This function is vital for understanding team dynamics and project involvement.
     async fn get_team(
         &self,
         id: Path<Uuid>,
@@ -421,6 +445,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Team",
         operation_id = "get_teams"
     )]
+    /// Compiles a list of all teams, demonstrating Plexo's comprehensive approach to team oversight and project distribution.
+    /// This function is essential for managing multiple teams across various projects.
     async fn get_teams(
         &self,
         input: Json<GetTeamsInput>,
@@ -442,6 +468,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Team",
         operation_id = "update_team"
     )]
+    /// Updates existing team details, reflecting changes in team structure or project alignment.
+    /// This function plays a key role in keeping team information current and aligned with ongoing projects.
     async fn update_team(
         &self,
         id: Path<Uuid>,
@@ -464,6 +492,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Team",
         operation_id = "delete_team"
     )]
+    /// Removes a team from the Plexo system, ensuring that the platform's focus remains on active and relevant teams.
+    /// This function is critical for effective project management and resource allocation.
     async fn delete_team(
         &self,
         id: Path<Uuid>,
@@ -485,6 +515,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Label",
         operation_id = "create_label"
     )]
+    /// Introduces a new label to Plexo, enhancing project categorization and task prioritization.
+    /// This function is essential for maintaining organized and efficient project workflows.
     async fn create_label(
         &self,
         input: Json<CreateLabelInput>,
@@ -506,6 +538,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Label",
         operation_id = "get_label"
     )]
+    /// Retrieves specific details about a label, utilizing Plexo's structured approach to task and project organization.
+    /// This function aids in understanding the role and impact of labels within project management.
     async fn get_label(
         &self,
         id: Path<Uuid>,
@@ -527,6 +561,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Label",
         operation_id = "get_labels"
     )]
+    /// Compiles a list of all labels in Plexo, showcasing the platform's comprehensive categorization capabilities.
+    /// This function is vital for overseeing task organization and project prioritization.
     async fn get_labels(
         &self,
         input: Json<GetLabelsInput>,
@@ -548,6 +584,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Label",
         operation_id = "update_label"
     )]
+    /// Updates an existing label's information, ensuring its relevance and effectiveness in project categorization.
+    /// This function is key to maintaining an organized and efficient project management system.
     async fn update_label(
         &self,
         id: Path<Uuid>,
@@ -570,6 +608,8 @@ impl PlexoOpenAPI {
         tag = "PlexoAPITags::Label",
         operation_id = "delete_label"
     )]
+    /// Deletes a label from Plexo, streamlining the categorization system to focus on current and active labels.
+    /// This function is important for maintaining clarity and efficiency in project organization.
     async fn delete_label(
         &self,
         id: Path<Uuid>,
