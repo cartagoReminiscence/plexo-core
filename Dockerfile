@@ -41,7 +41,7 @@ WORKDIR /app
 COPY ./ /app
 # do a release build
 RUN cargo build --release
-RUN strip target/release/plexo
+RUN strip target/release/plexo-core
 
 # use a plain alpine image, the alpine version needs to match the builder
 FROM alpine:3.16 as core
@@ -51,6 +51,6 @@ RUN apk add --no-cache libressl-dev
 
 COPY --from=platform-builder /app/out ./plexo-platform/out
 # copy the binary into the final image
-COPY --from=core-builder /app/target/release/plexo .
+COPY --from=core-builder /app/target/release/plexo-core .
 # set the binary as entrypoint
-ENTRYPOINT ["/plexo"]
+ENTRYPOINT ["/plexo-core"]
