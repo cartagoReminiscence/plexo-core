@@ -1,5 +1,5 @@
 # Install dependencies only when needed
-FROM node:16-alpine AS platform-deps
+FROM node:20-alpine AS platform-deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN \
 
 
 # Rebuild the source code only when needed
-FROM node:16-alpine AS platform-builder
+FROM node:20-alpine AS platform-builder
 WORKDIR /app
 COPY --from=platform-deps /app/node_modules ./node_modules
 COPY ./plexo-platform .
@@ -41,7 +41,7 @@ WORKDIR /app
 COPY ./ /app
 # do a release build
 RUN cargo build --release
-RUN strip target/release/plexo
+RUN strip target/release/plexo-core
 
 # use a plain alpine image, the alpine version needs to match the builder
 FROM alpine:3.16 as core
@@ -51,6 +51,6 @@ RUN apk add --no-cache libressl-dev
 
 COPY --from=platform-builder /app/out ./plexo-platform/out
 # copy the binary into the final image
-COPY --from=core-builder /app/target/release/plexo .
+COPY --from=core-builder /app/target/release/plexo-core .
 # set the binary as entrypoint
-ENTRYPOINT ["/plexo"]
+ENTRYPOINT ["/plexo-core"]
