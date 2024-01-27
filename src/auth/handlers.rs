@@ -2,8 +2,7 @@ use async_graphql::Error;
 use chrono::{Duration, Utc};
 use oauth2::{AuthorizationCode, CsrfToken};
 use plexo_sdk::members::extensions::{
-    CreateMemberFromEmailInputBuilder, CreateMemberFromGithubInputBuilder,
-    MembersExtensionOperations,
+    CreateMemberFromEmailInputBuilder, CreateMemberFromGithubInputBuilder, MembersExtensionOperations,
 };
 use plexo_sdk::members::member::Member;
 use poem::http::HeaderMap;
@@ -21,9 +20,7 @@ use crate::errors::app::PlexoAppError;
 
 use super::resources::PlexoAuthToken;
 use super::{
-    commons::{
-        get_token_from_cookie, get_token_from_headers, COOKIE_SESSION_TOKEN_NAME, GITHUB_USER_API,
-    },
+    commons::{get_token_from_cookie, get_token_from_headers, COOKIE_SESSION_TOKEN_NAME, GITHUB_USER_API},
     resources::{EmailLoginParams, EmailRegisterParams, GithubCallbackParams},
 };
 
@@ -45,10 +42,7 @@ pub async fn github_sign_in_handler(plexo_core: Data<&Core>) -> impl IntoRespons
 }
 
 #[handler]
-pub async fn github_callback_handler(
-    plexo_core: Data<&Core>,
-    params: Query<GithubCallbackParams>,
-) -> impl IntoResponse {
+pub async fn github_callback_handler(plexo_core: Data<&Core>, params: Query<GithubCallbackParams>) -> impl IntoResponse {
     let code = AuthorizationCode::new(params.code.clone());
     let state = CsrfToken::new(params.state.clone());
 
@@ -74,12 +68,7 @@ pub async fn github_callback_handler(
         .await
         .unwrap();
 
-    let github_id: String = github_user_data
-        .get("id")
-        .unwrap()
-        .as_i64()
-        .unwrap()
-        .to_string();
+    let github_id: String = github_user_data.get("id").unwrap().as_i64().unwrap().to_string();
 
     let user_email = github_user_data
         .get("email")
@@ -92,19 +81,10 @@ pub async fn github_callback_handler(
 
     let user_name = github_user_data
         .get("name")
-        .map(|v| {
-            v.as_str()
-                .map(|s| s.to_string())
-                .unwrap_or(github_id.clone())
-        })
+        .map(|v| v.as_str().map(|s| s.to_string()).unwrap_or(github_id.clone()))
         .unwrap();
 
-    let member: Member = match plexo_core
-        .0
-        .engine
-        .get_member_by_github_id(github_id.clone())
-        .await
-    {
+    let member: Member = match plexo_core.0.engine.get_member_by_github_id(github_id.clone()).await {
         Ok(member) => member,
         Err(_) => plexo_core
             .0
@@ -167,16 +147,8 @@ pub fn logout() -> impl IntoResponse {
 }
 
 #[handler]
-pub async fn email_basic_login_handler(
-    plexo_engine: Data<&Core>,
-    params: Json<EmailLoginParams>,
-) -> impl IntoResponse {
-    let Ok(member) = plexo_engine
-        .0
-        .engine
-        .get_member_by_email(params.email.clone())
-        .await
-    else {
+pub async fn email_basic_login_handler(plexo_engine: Data<&Core>, params: Json<EmailLoginParams>) -> impl IntoResponse {
+    let Ok(member) = plexo_engine.0.engine.get_member_by_email(params.email.clone()).await else {
         return Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .header("Content-Type", "application/json")
@@ -260,13 +232,7 @@ pub async fn email_basic_register_handler(
 
     // let (plexo_engine, member_id) = extract_context(ctx)?;
 
-    if (plexo_engine
-        .0
-        .engine
-        .get_member_by_email(params.email.clone())
-        .await)
-        .is_ok()
-    {
+    if (plexo_engine.0.engine.get_member_by_email(params.email.clone()).await).is_ok() {
         return Ok(Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .header("Content-Type", "application/json")
@@ -342,7 +308,6 @@ pub async fn logout_handler() -> Result<Response> {
 }
 
 #[handler]
-
 pub async fn get_open_api_specs(specs: Data<&PlexoOpenAPISpecs>) -> Result<String> {
     Ok(specs.0.clone().0)
 }
