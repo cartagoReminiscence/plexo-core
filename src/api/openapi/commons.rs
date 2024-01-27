@@ -15,4 +15,6 @@ pub enum PlexoAPITags {
     Team,
     /// Operations about labels
     Label,
+    /// Operations about assets
+    Asset,
 }

@@ -2,7 +2,7 @@ use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::teams::{
-    operations::{CreateTeamInput, GetTeamsInput, UpdateTeamInput, TeamCrudOperations},
+    operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput},
     team::Team,
 };
 use tokio_stream::Stream;
@@ -49,12 +49,7 @@ impl TeamsGraphQLMutation {
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_team(
-        &self,
-        ctx: &Context<'_>,
-        id: Uuid,
-        input: UpdateTeamInput,
-    ) -> Result<Team> {
+    async fn update_team(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTeamInput) -> Result<Team> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
@@ -82,5 +77,3 @@ impl TeamsGraphQLSubscription {
         futures_util::stream::iter(0..10)
     }
 }
-
-

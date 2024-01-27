@@ -59,13 +59,11 @@ pub async fn ws_switch_handler(
     websocket: WebSocket,
 ) -> impl IntoResponse {
     let schema = schema.0.clone();
-    websocket
-        .protocols(ALL_WEBSOCKET_PROTOCOLS)
-        .on_upgrade(move |stream| {
-            GraphQLWebSocket::new(stream, schema, protocol)
-                .on_connection_init(on_connection_init)
-                .serve()
-        })
+    websocket.protocols(ALL_WEBSOCKET_PROTOCOLS).on_upgrade(move |stream| {
+        GraphQLWebSocket::new(stream, schema, protocol)
+            .on_connection_init(on_connection_init)
+            .serve()
+    })
 }
 
 pub async fn on_connection_init(value: Value) -> async_graphql::Result<Data> {

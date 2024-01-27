@@ -1,7 +1,8 @@
 use plexo_sdk::errors::sdk::SDKError;
-use poem::error::ResponseError;
+use poem::{error::ResponseError, http::StatusCode};
 use thiserror::Error;
 
+// use poem::http::{HeaderMap, StatusCode};
 #[derive(Error, Debug)]
 pub enum PlexoAppError {
     #[error("Authorization token not provided")]
@@ -28,17 +29,17 @@ pub enum PlexoAppError {
 }
 
 impl ResponseError for PlexoAppError {
-    fn status(&self) -> reqwest::StatusCode {
+    fn status(&self) -> StatusCode {
         match self {
-            PlexoAppError::MissingAuthorizationToken => reqwest::StatusCode::UNAUTHORIZED,
-            PlexoAppError::InvalidAuthorizationToken => reqwest::StatusCode::UNAUTHORIZED,
-            PlexoAppError::EmailAlreadyInUse => reqwest::StatusCode::BAD_REQUEST,
-            PlexoAppError::InvalidPassword => reqwest::StatusCode::BAD_REQUEST,
-            PlexoAppError::EmailNotFound => reqwest::StatusCode::BAD_REQUEST,
-            PlexoAppError::EmailAlreadyExists => reqwest::StatusCode::BAD_REQUEST,
-            PlexoAppError::SDKError(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
-            PlexoAppError::NotFoundPoemError(_) => reqwest::StatusCode::NOT_FOUND,
-            PlexoAppError::JSONWebTokenError(_) => reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+            PlexoAppError::MissingAuthorizationToken => StatusCode::UNAUTHORIZED,
+            PlexoAppError::InvalidAuthorizationToken => StatusCode::UNAUTHORIZED,
+            PlexoAppError::EmailAlreadyInUse => StatusCode::BAD_REQUEST,
+            PlexoAppError::InvalidPassword => StatusCode::BAD_REQUEST,
+            PlexoAppError::EmailNotFound => StatusCode::BAD_REQUEST,
+            PlexoAppError::EmailAlreadyExists => StatusCode::BAD_REQUEST,
+            PlexoAppError::SDKError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            PlexoAppError::NotFoundPoemError(_) => StatusCode::NOT_FOUND,
+            PlexoAppError::JSONWebTokenError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

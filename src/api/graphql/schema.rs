@@ -5,14 +5,36 @@ use crate::core::app::Core;
 
 use super::{
     auth::AuthMutation,
-    operations::tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
+    operations::{
+        assets::{AssetsGraphQLMutation, AssetsGraphQLQuery},
+        labels::{LabelsGraphQLMutation, LabelsGraphQLQuery},
+        members::{MembersGraphQLMutation, MembersGraphQLQuery},
+        projects::{ProjectsGraphQLMutation, ProjectsGraphQLQuery},
+        tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
+        teams::{TeamsGraphQLMutation, TeamsGraphQLQuery},
+    },
 };
 
 #[derive(MergedObject, Default)]
-pub struct QueryRoot(TasksGraphQLQuery);
+pub struct QueryRoot(
+    TasksGraphQLQuery,
+    AssetsGraphQLQuery,
+    LabelsGraphQLQuery,
+    ProjectsGraphQLQuery,
+    TeamsGraphQLQuery,
+    MembersGraphQLQuery,
+);
 
 #[derive(MergedObject, Default)]
-pub struct MutationRoot(TasksGraphQLMutation, AuthMutation);
+pub struct MutationRoot(
+    TasksGraphQLMutation,
+    AuthMutation,
+    AssetsGraphQLMutation,
+    LabelsGraphQLMutation,
+    ProjectsGraphQLMutation,
+    TeamsGraphQLMutation,
+    MembersGraphQLMutation,
+);
 
 #[derive(MergedSubscription, Default)]
 pub struct SubscriptionRoot(TasksGraphQLSubscription);
@@ -23,26 +45,22 @@ pub trait GraphQLSchema {
 
 impl GraphQLSchema for Core {
     fn graphql_api_schema(&self) -> Schema<QueryRoot, MutationRoot, SubscriptionRoot> {
-        Schema::build(
-            QueryRoot::default(),
-            MutationRoot::default(),
-            SubscriptionRoot::default(),
-        )
-        .data(self.clone()) // TODO: Optimize this
-        // .data(DataLoader::new(TaskLoader::new(self.clone()), tokio::spawn))
-        // .data(DataLoader::new(
-        //     ProjectLoader::new(self.clone()),
-        //     tokio::spawn,
-        // ))
-        // .data(DataLoader::new(
-        //     LabelLoader::new(self.clone()),
-        //     tokio::spawn,
-        // ))
-        // .data(DataLoader::new(
-        //     MemberLoader::new(self.clone()),
-        //     tokio::spawn,
-        // ))
-        // .data(DataLoader::new(TeamLoader::new(self.clone()), tokio::spawn))
-        .finish()
+        Schema::build(QueryRoot::default(), MutationRoot::default(), SubscriptionRoot::default())
+            .data(self.clone()) // TODO: Optimize this
+            // .data(DataLoader::new(TaskLoader::new(self.clone()), tokio::spawn))
+            // .data(DataLoader::new(
+            //     ProjectLoader::new(self.clone()),
+            //     tokio::spawn,
+            // ))
+            // .data(DataLoader::new(
+            //     LabelLoader::new(self.clone()),
+            //     tokio::spawn,
+            // ))
+            // .data(DataLoader::new(
+            //     MemberLoader::new(self.clone()),
+            //     tokio::spawn,
+            // ))
+            // .data(DataLoader::new(TeamLoader::new(self.clone()), tokio::spawn))
+            .finish()
     }
 }

@@ -2,8 +2,8 @@ use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::labels::{
-    operations::{CreateLabelInput, GetLabelsInput, UpdateLabelInput, LabelCrudOperations},
     label::Label,
+    operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput},
 };
 use tokio_stream::Stream;
 use uuid::Uuid;
@@ -47,12 +47,7 @@ impl LabelsGraphQLMutation {
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_label(
-        &self,
-        ctx: &Context<'_>,
-        id: Uuid,
-        input: UpdateLabelInput,
-    ) -> Result<Label> {
+    async fn update_label(&self, ctx: &Context<'_>, id: Uuid, input: UpdateLabelInput) -> Result<Label> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
@@ -80,5 +75,3 @@ impl LabelsGraphQLSubscription {
         futures_util::stream::iter(0..10)
     }
 }
-
-

@@ -1,79 +1,77 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::tasks::{
-    operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
-    task::Task,
+use plexo_sdk::assets::{
+    asset::Asset,
+    operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput},
 };
 use tokio_stream::Stream;
 use uuid::Uuid;
 
 #[derive(Default)]
-pub struct TasksGraphQLQuery;
+pub struct AssetsGraphQLQuery;
 
 #[Object]
-impl TasksGraphQLQuery {
-    async fn tasks(&self, ctx: &Context<'_>, input: Option<GetTasksInput>) -> Result<Vec<Task>> {
+impl AssetsGraphQLQuery {
+    async fn assets(&self, ctx: &Context<'_>, input: GetAssetsInput) -> Result<Vec<Asset>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_tasks(input)
+            .get_assets(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn task(&self, ctx: &Context<'_>, id: Uuid) -> Result<Task> {
+    async fn asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_task(id)
+            .get_asset(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 }
 
 #[derive(Default)]
-pub struct TasksGraphQLMutation;
+pub struct AssetsGraphQLMutation;
 
 #[Object]
-impl TasksGraphQLMutation {
+impl AssetsGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
-    async fn create_task(&self, ctx: &Context<'_>, mut input: CreateTaskInput) -> Result<Task> {
-        let (core, member_id) = extract_context(ctx)?;
-
-        input.owner_id = member_id;
+    async fn create_asset(&self, ctx: &Context<'_>, input: CreateAssetInput) -> Result<Asset> {
+        let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .create_task(input)
+            .create_asset(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_task(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTaskInput) -> Result<Task> {
+    async fn update_asset(&self, ctx: &Context<'_>, id: Uuid, input: UpdateAssetInput) -> Result<Asset> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .update_task(id, input)
+            .update_asset(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn delete_task(&self, ctx: &Context<'_>, id: Uuid) -> Result<Task> {
+    async fn delete_asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .delete_task(id)
+            .delete_asset(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 }
 
 #[derive(Default)]
-pub struct TasksGraphQLSubscription;
+pub struct AssetsGraphQLSubscription;
 
 #[Subscription]
-impl TasksGraphQLSubscription {
-    async fn events1(&self) -> impl Stream<Item = i32> {
+impl AssetsGraphQLSubscription {
+    async fn events_asset(&self) -> impl Stream<Item = i32> {
         futures_util::stream::iter(0..10)
     }
 }

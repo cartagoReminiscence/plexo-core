@@ -5,12 +5,12 @@ use plexo_sdk::members::extensions::{
     CreateMemberFromEmailInputBuilder, CreateMemberFromGithubInputBuilder, MembersExtensionOperations,
 };
 use plexo_sdk::members::member::Member;
-use poem::http::HeaderMap;
+
+use poem::http::header::{CACHE_CONTROL, EXPIRES, LOCATION, PRAGMA, SET_COOKIE};
+use poem::http::{HeaderMap, StatusCode};
 use poem::web::cookie::{Cookie, SameSite};
 use poem::web::{Data, Json, Query, Redirect};
 use poem::{handler, Body, IntoResponse, Response, Result};
-use reqwest::header::{CACHE_CONTROL, EXPIRES, LOCATION, PRAGMA, SET_COOKIE};
-use reqwest::StatusCode;
 
 use serde_json::{json, Value};
 

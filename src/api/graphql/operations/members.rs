@@ -2,8 +2,8 @@ use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::members::{
-    operations::{CreateMemberInput, GetMembersInput, UpdateMemberInput, MemberCrudOperations},
     member::Member,
+    operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput},
 };
 use tokio_stream::Stream;
 use uuid::Uuid;
@@ -46,12 +46,7 @@ impl MembersGraphQLMutation {
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_member(
-        &self,
-        ctx: &Context<'_>,
-        id: Uuid,
-        input: UpdateMemberInput,
-    ) -> Result<Member> {
+    async fn update_member(&self, ctx: &Context<'_>, id: Uuid, input: UpdateMemberInput) -> Result<Member> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
@@ -79,4 +74,3 @@ impl MembersGraphQLSubscription {
         futures_util::stream::iter(0..10)
     }
 }
-

@@ -1,20 +1,12 @@
+use plexo_sdk::assets::asset::Asset;
+use plexo_sdk::assets::operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput};
 use plexo_sdk::labels::label::Label;
-use plexo_sdk::labels::operations::{
-    CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput,
-};
+use plexo_sdk::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput};
 use plexo_sdk::members::member::Member;
-use plexo_sdk::members::operations::{
-    CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput,
-};
-use plexo_sdk::projects::operations::{
-    CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput,
-};
-use plexo_sdk::tasks::operations::{
-    CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput,
-};
-use plexo_sdk::teams::operations::{
-    CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput,
-};
+use plexo_sdk::members::operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput};
+use plexo_sdk::projects::operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput};
+use plexo_sdk::tasks::operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput};
+use plexo_sdk::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
 use plexo_sdk::teams::team::Team;
 use plexo_sdk::{projects::project::Project, tasks::task::Task};
 use poem::Result;
@@ -40,67 +32,30 @@ impl PlexoOpenAPI {
 
 #[OpenApi]
 impl PlexoOpenAPI {
-    #[oai(
-        path = "/tasks",
-        method = "post",
-        tag = "PlexoAPITags::Task",
-        operation_id = "create_task"
-    )]
+    #[oai(path = "/tasks", method = "post", tag = "PlexoAPITags::Task", operation_id = "create_task")]
     /// Creates a new task leveraging Plexo's AI-powered autonomous task generation.
     /// This function streamlines the planning process by intelligently considering project requirements and team capabilities.
-    async fn create_task(
-        &self,
-        mut input: Json<CreateTaskInput>,
-        auth: PlexoAPIKeyAuthorization,
-    ) -> Result<CreateTaskResponse> {
+    async fn create_task(&self, mut input: Json<CreateTaskInput>, auth: PlexoAPIKeyAuthorization) -> Result<CreateTaskResponse> {
         input.owner_id = auth.0.member_id();
 
-        let task = self
-            .core
-            .engine
-            .create_task(input.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+        let task = self.core.engine.create_task(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(CreateTaskResponse::Ok(Json(task)))
     }
 
-    #[oai(
-        path = "/tasks/:id",
-        method = "get",
-        tag = "PlexoAPITags::Task",
-        operation_id = "get_task"
-    )]
+    #[oai(path = "/tasks/:id", method = "get", tag = "PlexoAPITags::Task", operation_id = "get_task")]
     /// Retrieves a specific task, utilizing Plexo's real-time task tracking feature.
     /// This function aids in monitoring the progress of individual tasks within a project.
-    async fn get_task(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetTaskResponse> {
-        let task = self
-            .core
-            .engine
-            .get_task(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_task(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTaskResponse> {
+        let task = self.core.engine.get_task(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetTaskResponse::Ok(Json(task)))
     }
 
-    #[oai(
-        path = "/tasks",
-        method = "get",
-        tag = "PlexoAPITags::Task",
-        operation_id = "get_tasks"
-    )]
+    #[oai(path = "/tasks", method = "get", tag = "PlexoAPITags::Task", operation_id = "get_tasks")]
     /// Retrieves a list of tasks using Plexo's real-time task tracking feature filtered by the input provided.
     /// This function helps in monitoring the progress of a specific group of tasks.
-    async fn get_tasks(
-        &self,
-        input: Json<GetTasksInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetTasksResponse> {
+    async fn get_tasks(&self, input: Json<GetTasksInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTasksResponse> {
         let tasks = self
             .core
             .engine
@@ -143,17 +98,8 @@ impl PlexoOpenAPI {
     )]
     /// Deletes an existing task in a certain project.
     /// This function helps in removing a task that is no longer needed within a project.
-    async fn delete_task(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<DeleteTaskResponse> {
-        let task = self
-            .core
-            .engine
-            .delete_task(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn delete_task(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteTaskResponse> {
+        let task = self.core.engine.delete_task(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(DeleteTaskResponse::Ok(Json(task)))
     }
@@ -191,17 +137,8 @@ impl PlexoOpenAPI {
     )]
     /// Retrieves detailed information about a specific project, employing Plexo's real-time tracking and AI analytics.
     /// This function facilitates in-depth insight into project progress and dynamics.
-    async fn get_project(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetProjectResponse> {
-        let project = self
-            .core
-            .engine
-            .get_project(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_project(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetProjectResponse> {
+        let project = self.core.engine.get_project(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetProjectResponse::Ok(Json(project)))
     }
@@ -214,11 +151,7 @@ impl PlexoOpenAPI {
     )]
     /// Gathers a list of all projects, leveraging Plexo's comprehensive data management and AI insights.
     /// This function aids in overseeing multiple projects, enhancing strategic decision-making.
-    async fn get_projects(
-        &self,
-        input: Json<GetProjectsInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> GetProjectsResponse {
+    async fn get_projects(&self, input: Json<GetProjectsInput>, _auth: PlexoAPIKeyAuthorization) -> GetProjectsResponse {
         let projects = self
             .core
             .engine
@@ -262,17 +195,8 @@ impl PlexoOpenAPI {
     )]
     /// Removes a project from Plexo's system, maintaining the platform's focus on current and active projects.
     /// This function is crucial for project lifecycle management and resource allocation optimization.
-    async fn delete_project(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<DeleteProjectResponse> {
-        let project = self
-            .core
-            .engine
-            .delete_project(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn delete_project(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteProjectResponse> {
+        let project = self.core.engine.delete_project(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(DeleteProjectResponse::Ok(Json(project)))
     }
@@ -285,11 +209,7 @@ impl PlexoOpenAPI {
     )]
     /// Registers a new member in the Plexo system, harnessing the AI capabilities for optimal team integration.
     /// This function is essential for expanding the team and managing member roles effectively.
-    async fn create_member(
-        &self,
-        input: Json<CreateMemberInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<CreateMemberResponse> {
+    async fn create_member(&self, input: Json<CreateMemberInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateMemberResponse> {
         let member = self
             .core
             .engine
@@ -308,17 +228,8 @@ impl PlexoOpenAPI {
     )]
     /// Retrieves detailed information about a specific member, utilizing Plexo's efficient member management system.
     /// This function aids in understanding individual member contributions and roles within a project.
-    async fn get_member(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetMemberResponse> {
-        let member = self
-            .core
-            .engine
-            .get_member(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_member(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetMemberResponse> {
+        let member = self.core.engine.get_member(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetMemberResponse::Ok(Json(member)))
     }
@@ -331,17 +242,8 @@ impl PlexoOpenAPI {
     )]
     /// Gathers a comprehensive list of all members, leveraging Plexo's robust data management capabilities.
     /// This function enables effective oversight of team composition and individual member roles.
-    async fn get_members(
-        &self,
-        input: Json<GetMembersInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetMembersResponse> {
-        let members = self
-            .core
-            .engine
-            .get_members(input.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_members(&self, input: Json<GetMembersInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetMembersResponse> {
+        let members = self.core.engine.get_members(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetMembersResponse::Ok(Json(members)))
     }
@@ -378,86 +280,35 @@ impl PlexoOpenAPI {
     )]
     /// Deletes a member's profile from Plexo, maintaining the accuracy of team composition and project alignment.
     /// This function is key for managing team dynamics and project resources.
-    async fn delete_member(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<DeleteMemberResponse> {
-        let member = self
-            .core
-            .engine
-            .delete_member(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn delete_member(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteMemberResponse> {
+        let member = self.core.engine.delete_member(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(DeleteMemberResponse::Ok(Json(member)))
     }
 
-    #[oai(
-        path = "/teams",
-        method = "post",
-        tag = "PlexoAPITags::Team",
-        operation_id = "create_team"
-    )]
+    #[oai(path = "/teams", method = "post", tag = "PlexoAPITags::Team", operation_id = "create_team")]
     /// Creates a new team within Plexo, employing AI-driven insights for optimal team formation and project alignment.
     /// This function is crucial for structuring teams based on project needs and member skills.
-    async fn create_team(
-        &self,
-        input: Json<CreateTeamInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<CreateTeamResponse> {
-        let team = self
-            .core
-            .engine
-            .create_team(input.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn create_team(&self, input: Json<CreateTeamInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateTeamResponse> {
+        let team = self.core.engine.create_team(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(CreateTeamResponse::Ok(Json(team)))
     }
 
-    #[oai(
-        path = "/teams/:id",
-        method = "get",
-        tag = "PlexoAPITags::Team",
-        operation_id = "get_team"
-    )]
+    #[oai(path = "/teams/:id", method = "get", tag = "PlexoAPITags::Team", operation_id = "get_team")]
     /// Retrieves detailed information about a specific team, showcasing Plexo's capability in team management and analytics.
     /// This function is vital for understanding team dynamics and project involvement.
-    async fn get_team(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetTeamResponse> {
-        let team = self
-            .core
-            .engine
-            .get_team(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_team(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTeamResponse> {
+        let team = self.core.engine.get_team(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetTeamResponse::Ok(Json(team)))
     }
 
-    #[oai(
-        path = "/teams",
-        method = "get",
-        tag = "PlexoAPITags::Team",
-        operation_id = "get_teams"
-    )]
+    #[oai(path = "/teams", method = "get", tag = "PlexoAPITags::Team", operation_id = "get_teams")]
     /// Compiles a list of all teams, demonstrating Plexo's comprehensive approach to team oversight and project distribution.
     /// This function is essential for managing multiple teams across various projects.
-    async fn get_teams(
-        &self,
-        input: Json<GetTeamsInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetTeamsResponse> {
-        let teams = self
-            .core
-            .engine
-            .get_teams(input.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_teams(&self, input: Json<GetTeamsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTeamsResponse> {
+        let teams = self.core.engine.get_teams(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetTeamsResponse::Ok(Json(teams)))
     }
@@ -494,17 +345,8 @@ impl PlexoOpenAPI {
     )]
     /// Removes a team from the Plexo system, ensuring that the platform's focus remains on active and relevant teams.
     /// This function is critical for effective project management and resource allocation.
-    async fn delete_team(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<DeleteTeamResponse> {
-        let team = self
-            .core
-            .engine
-            .delete_team(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn delete_team(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteTeamResponse> {
+        let team = self.core.engine.delete_team(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(DeleteTeamResponse::Ok(Json(team)))
     }
@@ -517,11 +359,7 @@ impl PlexoOpenAPI {
     )]
     /// Introduces a new label to Plexo, enhancing project categorization and task prioritization.
     /// This function is essential for maintaining organized and efficient project workflows.
-    async fn create_label(
-        &self,
-        input: Json<CreateLabelInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<CreateLabelResponse> {
+    async fn create_label(&self, input: Json<CreateLabelInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateLabelResponse> {
         let label = self
             .core
             .engine
@@ -540,40 +378,17 @@ impl PlexoOpenAPI {
     )]
     /// Retrieves specific details about a label, utilizing Plexo's structured approach to task and project organization.
     /// This function aids in understanding the role and impact of labels within project management.
-    async fn get_label(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetLabelResponse> {
-        let label = self
-            .core
-            .engine
-            .get_label(id.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_label(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetLabelResponse> {
+        let label = self.core.engine.get_label(id.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetLabelResponse::Ok(Json(label)))
     }
 
-    #[oai(
-        path = "/labels",
-        method = "get",
-        tag = "PlexoAPITags::Label",
-        operation_id = "get_labels"
-    )]
+    #[oai(path = "/labels", method = "get", tag = "PlexoAPITags::Label", operation_id = "get_labels")]
     /// Compiles a list of all labels in Plexo, showcasing the platform's comprehensive categorization capabilities.
     /// This function is vital for overseeing task organization and project prioritization.
-    async fn get_labels(
-        &self,
-        input: Json<GetLabelsInput>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<GetLabelsResponse> {
-        let labels = self
-            .core
-            .engine
-            .get_labels(input.0)
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_labels(&self, input: Json<GetLabelsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetLabelsResponse> {
+        let labels = self.core.engine.get_labels(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetLabelsResponse::Ok(Json(labels)))
     }
@@ -610,19 +425,90 @@ impl PlexoOpenAPI {
     )]
     /// Deletes a label from Plexo, streamlining the categorization system to focus on current and active labels.
     /// This function is important for maintaining clarity and efficiency in project organization.
-    async fn delete_label(
-        &self,
-        id: Path<Uuid>,
-        _auth: PlexoAPIKeyAuthorization,
-    ) -> Result<DeleteLabelResponse> {
-        let label = self
+    async fn delete_label(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteLabelResponse> {
+        let label = self.core.engine.delete_label(id.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(DeleteLabelResponse::Ok(Json(label)))
+    }
+
+    #[oai(
+        path = "/assets",
+        method = "post",
+        tag = "PlexoAPITags::Asset",
+        operation_id = "create_asset"
+    )]
+    /// Introduces a new asset to Plexo, enhancing project categorization and task prioritization.
+    /// This function is essential for maintaining organized and efficient project workflows.
+    async fn create_asset(&self, input: Json<CreateAssetInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateAssetResponse> {
+        let asset = self
             .core
             .engine
-            .delete_label(id.0)
+            .create_asset(input.0)
             .await
             .map_err(PlexoAppError::SDKError)?;
 
-        Ok(DeleteLabelResponse::Ok(Json(label)))
+        Ok(CreateAssetResponse::Ok(Json(asset)))
+    }
+
+    #[oai(
+        path = "/assets/:id",
+        method = "get",
+        tag = "PlexoAPITags::Asset",
+        operation_id = "get_asset"
+    )]
+    /// Retrieves specific details about an asset, utilizing Plexo's structured approach to task and project organization.
+    /// This function aids in understanding the role and impact of assets within project management.
+    async fn get_asset(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetAssetResponse> {
+        let asset = self.core.engine.get_asset(id.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(GetAssetResponse::Ok(Json(asset)))
+    }
+
+    #[oai(path = "/assets", method = "get", tag = "PlexoAPITags::Asset", operation_id = "get_assets")]
+    /// Compiles a list of all assets in Plexo, showcasing the platform's comprehensive categorization capabilities.
+    /// This function is vital for overseeing task organization and project prioritization.
+    async fn get_assets(&self, input: Json<GetAssetsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetAssetsResponse> {
+        let assets = self.core.engine.get_assets(input.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(GetAssetsResponse::Ok(Json(assets)))
+    }
+
+    #[oai(
+        path = "/assets/:id",
+        method = "put",
+        tag = "PlexoAPITags::Asset",
+        operation_id = "update_asset"
+    )]
+    /// Updates an existing asset's information, ensuring its relevance and effectiveness in project categorization.
+    /// This function is key to maintaining an organized and efficient project management system.
+    async fn update_asset(
+        &self,
+        id: Path<Uuid>,
+        input: Json<UpdateAssetInput>,
+        _auth: PlexoAPIKeyAuthorization,
+    ) -> Result<UpdateAssetResponse> {
+        let asset = self
+            .core
+            .engine
+            .update_asset(id.0, input.0)
+            .await
+            .map_err(PlexoAppError::SDKError)?;
+
+        Ok(UpdateAssetResponse::Ok(Json(asset)))
+    }
+
+    #[oai(
+        path = "/assets/:id",
+        method = "delete",
+        tag = "PlexoAPITags::Asset",
+        operation_id = "delete_asset"
+    )]
+    /// Deletes an asset from Plexo, streamlining the categorization system to focus on current and active assets.
+    /// This function is important for maintaining clarity and efficiency in project organization.
+    async fn delete_asset(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteAssetResponse> {
+        let asset = self.core.engine.delete_asset(id.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(DeleteAssetResponse::Ok(Json(asset)))
     }
 }
 
@@ -861,6 +747,55 @@ enum DeleteLabelResponse {
     /// Returns when the user is successfully created.
     #[oai(status = 200)]
     Ok(Json<Label>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+//
+//
+//
+
+//
+//
+//
+
+#[derive(ApiResponse)]
+enum CreateAssetResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Asset>),
+}
+
+#[derive(ApiResponse)]
+enum GetAssetsResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Vec<Asset>>),
+}
+
+#[derive(ApiResponse)]
+enum GetAssetResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Asset>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+#[derive(ApiResponse)]
+enum UpdateAssetResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Asset>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+#[derive(ApiResponse)]
+enum DeleteAssetResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Asset>),
     // #[oai(status = 404)]
     // NotFound,
 }

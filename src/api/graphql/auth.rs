@@ -1,7 +1,5 @@
 use async_graphql::{Context, Object, Result, SimpleObject};
-use plexo_sdk::members::extensions::{
-    CreateMemberFromEmailInputBuilder, MembersExtensionOperations,
-};
+use plexo_sdk::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
 
 use crate::{core::app::Core, errors::app::PlexoAppError};
 
@@ -18,12 +16,7 @@ struct LoginResponse {
 
 #[Object]
 impl AuthMutation {
-    async fn login(
-        &self,
-        ctx: &Context<'_>,
-        email: String,
-        password: String,
-    ) -> Result<LoginResponse> {
+    async fn login(&self, ctx: &Context<'_>, email: String, password: String) -> Result<LoginResponse> {
         let plexo_engine = ctx.data::<Core>()?.to_owned();
 
         let Ok(member) = plexo_engine.engine.get_member_by_email(email.clone()).await else {
@@ -34,10 +27,7 @@ impl AuthMutation {
             return Err(PlexoAppError::InvalidPassword.into());
         };
 
-        if !plexo_engine
-            .auth
-            .validate_password(password.as_str(), password_hash.as_str())
-        {
+        if !plexo_engine.auth.validate_password(password.as_str(), password_hash.as_str()) {
             return Err(PlexoAppError::InvalidPassword.into());
         };
 
@@ -51,13 +41,7 @@ impl AuthMutation {
         })
     }
 
-    async fn register(
-        &self,
-        ctx: &Context<'_>,
-        email: String,
-        name: String,
-        password: String,
-    ) -> Result<LoginResponse> {
+    async fn register(&self, ctx: &Context<'_>, email: String, name: String, password: String) -> Result<LoginResponse> {
         let (plexo_engine, _member_id) = extract_context(ctx)?;
 
         if (plexo_engine.engine.get_member_by_email(email.clone()).await).is_ok() {

@@ -1,6 +1,6 @@
 use super::resources::PlexoAuthToken;
 use cookie::Cookie;
-use reqwest::header::HeaderMap;
+use poem::http::HeaderMap;
 
 pub const GITHUB_USER_API: &str = "https://api.github.com/user";
 pub const COOKIE_SESSION_TOKEN_NAME: &str = "plexo-session-token";

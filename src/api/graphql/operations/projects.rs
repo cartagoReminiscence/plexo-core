@@ -49,12 +49,7 @@ impl ProjectsGraphQLMutation {
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_project(
-        &self,
-        ctx: &Context<'_>,
-        id: Uuid,
-        input: UpdateProjectInput,
-    ) -> Result<Project> {
+    async fn update_project(&self, ctx: &Context<'_>, id: Uuid, input: UpdateProjectInput) -> Result<Project> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
@@ -82,4 +77,3 @@ impl ProjectsGraphQLSubscription {
         futures_util::stream::iter(0..10)
     }
 }
-

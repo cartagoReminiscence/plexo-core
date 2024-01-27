@@ -7,8 +7,7 @@ use plexo_core::{
         openapi::{api::PlexoOpenAPI, commons::PlexoOpenAPISpecs},
     },
     auth::handlers::{
-        email_basic_login_handler, get_open_api_specs, github_callback_handler,
-        github_sign_in_handler, logout_handler,
+        email_basic_login_handler, get_open_api_specs, github_callback_handler, github_sign_in_handler, logout_handler,
     },
     core::{
         app::new_core_from_env,
@@ -27,8 +26,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let graphql_schema = core.graphql_api_schema();
 
-    let api_service = OpenApiService::new(PlexoOpenAPI::new(core.clone()), "Plexo Open API", "1.0")
-        .server("http://localhost:8080/api");
+    let api_service =
+        OpenApiService::new(PlexoOpenAPI::new(core.clone()), "Plexo Open API", "1.0").server("http://localhost:8080/api");
 
     let api_spec = PlexoOpenAPISpecs(api_service.spec());
     let ui = api_service.swagger_ui();
