@@ -13,11 +13,11 @@ pub struct AssetsGraphQLQuery;
 
 #[Object]
 impl AssetsGraphQLQuery {
-    async fn assets(&self, ctx: &Context<'_>, input: GetAssetsInput) -> Result<Vec<Asset>> {
+    async fn assets(&self, ctx: &Context<'_>, input: Option<GetAssetsInput>) -> Result<Vec<Asset>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_assets(input)
+            .get_assets(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }

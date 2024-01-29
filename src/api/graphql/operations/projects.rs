@@ -13,11 +13,11 @@ pub struct ProjectsGraphQLQuery;
 
 #[Object]
 impl ProjectsGraphQLQuery {
-    async fn projects(&self, ctx: &Context<'_>, input: GetProjectsInput) -> Result<Vec<Project>> {
+    async fn projects(&self, ctx: &Context<'_>, input: Option<GetProjectsInput>) -> Result<Vec<Project>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_projects(input)
+            .get_projects(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }

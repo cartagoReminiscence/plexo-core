@@ -13,11 +13,11 @@ pub struct TeamsGraphQLQuery;
 
 #[Object]
 impl TeamsGraphQLQuery {
-    async fn teams(&self, ctx: &Context<'_>, input: GetTeamsInput) -> Result<Vec<Team>> {
+    async fn teams(&self, ctx: &Context<'_>, input: Option<GetTeamsInput>) -> Result<Vec<Team>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_teams(input)
+            .get_teams(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }

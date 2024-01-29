@@ -13,11 +13,11 @@ pub struct LabelsGraphQLQuery;
 
 #[Object]
 impl LabelsGraphQLQuery {
-    async fn labels(&self, ctx: &Context<'_>, input: GetLabelsInput) -> Result<Vec<Label>> {
+    async fn labels(&self, ctx: &Context<'_>, input: Option<GetLabelsInput>) -> Result<Vec<Label>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_labels(input)
+            .get_labels(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }

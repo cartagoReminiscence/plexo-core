@@ -1,5 +1,5 @@
 use chrono::Utc;
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use plexo_sdk::members::member::Member;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -54,11 +54,19 @@ impl JWTEngine {
     }
 
     pub fn decode_session_token(&self, token: &str) -> Result<PlexoAuthTokenClaims, PlexoAppError> {
-        let token_data = decode::<PlexoAuthTokenClaims>(
-            token,
-            &DecodingKey::from_secret(self.access_token_secret.as_ref()),
-            &jsonwebtoken::Validation::default(),
-        )?;
+        let key = self.access_token_secret.as_ref();
+
+        // println!("key: {:?}", key);
+
+        let mut validator = Validation::default();
+
+        validator.set_audience(&["session.plexo.app"]);
+
+        let token_data = decode::<PlexoAuthTokenClaims>(token, &DecodingKey::from_secret(key), &validator);
+
+        // println!("token_data: {:?}", token_data);
+
+        let token_data = token_data.unwrap();
 
         Ok(token_data.claims)
     }

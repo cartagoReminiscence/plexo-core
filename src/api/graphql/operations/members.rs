@@ -13,11 +13,11 @@ pub struct MembersGraphQLQuery;
 
 #[Object]
 impl MembersGraphQLQuery {
-    async fn members(&self, ctx: &Context<'_>, input: GetMembersInput) -> Result<Vec<Member>> {
+    async fn members(&self, ctx: &Context<'_>, input: Option<GetMembersInput>) -> Result<Vec<Member>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_members(input)
+            .get_members(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }

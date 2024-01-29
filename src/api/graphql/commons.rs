@@ -8,11 +8,15 @@ pub fn extract_context(ctx: &Context<'_>) -> Result<(Core, Uuid)> {
         return Err(PlexoAppError::MissingAuthorizationToken.into());
     };
 
+    // println!("auth_token: {:?}", auth_token.0);
+
     let plexo_engine = ctx.data::<Core>()?.to_owned();
 
-    let Ok(claims) = plexo_engine.auth.extract_claims(auth_token) else {
-        return Err(PlexoAppError::InvalidAuthorizationToken.into());
-    };
+    // let Ok(claims) = plexo_engine.auth.extract_claims(auth_token) else {
+    //     return Err(PlexoAppError::InvalidAuthorizationToken.into());
+    // };
+
+    let claims = plexo_engine.auth.extract_claims(auth_token)?;
 
     let member_id = claims.member_id();
 
