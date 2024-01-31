@@ -2,13 +2,8 @@ use std::error::Error;
 
 use dotenv::dotenv;
 use plexo_core::{
-    api::{
-        graphql::schema::GraphQLSchema,
-        openapi::{api::PlexoOpenAPI, commons::PlexoOpenAPISpecs},
-    },
-    auth::handlers::{
-        email_basic_login_handler, get_open_api_specs, github_callback_handler, github_sign_in_handler, logout_handler,
-    },
+    api::{graphql::schema::GraphQLSchema, openapi::api::PlexoOpenAPI},
+    auth::handlers::{email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler},
     core::{
         app::new_core_from_env,
         config::{DOMAIN, URL},

@@ -5,7 +5,7 @@ use plexo_sdk::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudO
 use plexo_sdk::members::member::Member;
 use plexo_sdk::members::operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput};
 use plexo_sdk::projects::operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput};
-use plexo_sdk::tasks::operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput};
+use plexo_sdk::tasks::operations::{CreateTaskInput, TaskCrudOperations, UpdateTaskInput};
 use plexo_sdk::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
 use plexo_sdk::teams::team::Team;
 use plexo_sdk::{projects::project::Project, tasks::task::Task};
@@ -30,14 +30,12 @@ impl PlexoOpenAPI {
     }
 }
 
-#[OpenApi(prefix_path = "/api")]
+#[OpenApi]
 impl PlexoOpenAPI {
     #[oai(path = "/tasks", method = "post", tag = "PlexoAPITags::Task", operation_id = "create_task")]
     /// Creates a new task leveraging Plexo's AI-powered autonomous task generation.
     /// This function streamlines the planning process by intelligently considering project requirements and team capabilities.
-    async fn create_task(&self, mut input: Json<CreateTaskInput>, auth: PlexoAPIKeyAuthorization) -> Result<CreateTaskResponse> {
-        input.owner_id = auth.0.member_id();
-
+    async fn create_task(&self, input: Json<CreateTaskInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateTaskResponse> {
         let task = self.core.engine.create_task(input.0).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(CreateTaskResponse::Ok(Json(task)))
@@ -55,13 +53,8 @@ impl PlexoOpenAPI {
     #[oai(path = "/tasks", method = "get", tag = "PlexoAPITags::Task", operation_id = "get_tasks")]
     /// Retrieves a list of tasks using Plexo's real-time task tracking feature filtered by the input provided.
     /// This function helps in monitoring the progress of a specific group of tasks.
-    async fn get_tasks(&self, input: Json<GetTasksInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTasksResponse> {
-        let tasks = self
-            .core
-            .engine
-            .get_tasks(Some(input.0))
-            .await
-            .map_err(PlexoAppError::SDKError)?;
+    async fn get_tasks(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetTasksResponse> {
+        let tasks = self.core.engine.get_tasks(None).await.map_err(PlexoAppError::SDKError)?;
 
         Ok(GetTasksResponse::Ok(Json(tasks)))
     }
@@ -114,11 +107,9 @@ impl PlexoOpenAPI {
     /// This function allows for setting up the framework of a project, aligning it with team goals and resources.
     async fn create_project(
         &self,
-        mut input: Json<CreateProjectInput>,
-        auth: PlexoAPIKeyAuthorization,
+        input: Json<CreateProjectInput>,
+        _auth: PlexoAPIKeyAuthorization,
     ) -> Result<CreateProjectResponse> {
-        input.owner_id = auth.0.member_id();
-
         let project = self
             .core
             .engine
@@ -151,11 +142,11 @@ impl PlexoOpenAPI {
     )]
     /// Gathers a list of all projects, leveraging Plexo's comprehensive data management and AI insights.
     /// This function aids in overseeing multiple projects, enhancing strategic decision-making.
-    async fn get_projects(&self, input: Json<GetProjectsInput>, _auth: PlexoAPIKeyAuthorization) -> GetProjectsResponse {
+    async fn get_projects(&self, _auth: PlexoAPIKeyAuthorization) -> GetProjectsResponse {
         let projects = self
             .core
             .engine
-            .get_projects(input.0)
+            .get_projects(GetProjectsInput::default())
             .await
             .map_err(PlexoAppError::SDKError)
             .unwrap();
@@ -242,8 +233,13 @@ impl PlexoOpenAPI {
     )]
     /// Gathers a comprehensive list of all members, leveraging Plexo's robust data management capabilities.
     /// This function enables effective oversight of team composition and individual member roles.
-    async fn get_members(&self, input: Json<GetMembersInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetMembersResponse> {
-        let members = self.core.engine.get_members(input.0).await.map_err(PlexoAppError::SDKError)?;
+    async fn get_members(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetMembersResponse> {
+        let members = self
+            .core
+            .engine
+            .get_members(GetMembersInput::default())
+            .await
+            .map_err(PlexoAppError::SDKError)?;
 
         Ok(GetMembersResponse::Ok(Json(members)))
     }
@@ -307,8 +303,13 @@ impl PlexoOpenAPI {
     #[oai(path = "/teams", method = "get", tag = "PlexoAPITags::Team", operation_id = "get_teams")]
     /// Compiles a list of all teams, demonstrating Plexo's comprehensive approach to team oversight and project distribution.
     /// This function is essential for managing multiple teams across various projects.
-    async fn get_teams(&self, input: Json<GetTeamsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetTeamsResponse> {
-        let teams = self.core.engine.get_teams(input.0).await.map_err(PlexoAppError::SDKError)?;
+    async fn get_teams(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetTeamsResponse> {
+        let teams = self
+            .core
+            .engine
+            .get_teams(GetTeamsInput::default())
+            .await
+            .map_err(PlexoAppError::SDKError)?;
 
         Ok(GetTeamsResponse::Ok(Json(teams)))
     }
@@ -387,8 +388,13 @@ impl PlexoOpenAPI {
     #[oai(path = "/labels", method = "get", tag = "PlexoAPITags::Label", operation_id = "get_labels")]
     /// Compiles a list of all labels in Plexo, showcasing the platform's comprehensive categorization capabilities.
     /// This function is vital for overseeing task organization and project prioritization.
-    async fn get_labels(&self, input: Json<GetLabelsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetLabelsResponse> {
-        let labels = self.core.engine.get_labels(input.0).await.map_err(PlexoAppError::SDKError)?;
+    async fn get_labels(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetLabelsResponse> {
+        let labels = self
+            .core
+            .engine
+            .get_labels(GetLabelsInput::default())
+            .await
+            .map_err(PlexoAppError::SDKError)?;
 
         Ok(GetLabelsResponse::Ok(Json(labels)))
     }
@@ -467,8 +473,13 @@ impl PlexoOpenAPI {
     #[oai(path = "/assets", method = "get", tag = "PlexoAPITags::Asset", operation_id = "get_assets")]
     /// Compiles a list of all assets in Plexo, showcasing the platform's comprehensive categorization capabilities.
     /// This function is vital for overseeing task organization and project prioritization.
-    async fn get_assets(&self, input: Json<GetAssetsInput>, _auth: PlexoAPIKeyAuthorization) -> Result<GetAssetsResponse> {
-        let assets = self.core.engine.get_assets(input.0).await.map_err(PlexoAppError::SDKError)?;
+    async fn get_assets(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetAssetsResponse> {
+        let assets = self
+            .core
+            .engine
+            .get_assets(GetAssetsInput::default())
+            .await
+            .map_err(PlexoAppError::SDKError)?;
 
         Ok(GetAssetsResponse::Ok(Json(assets)))
     }
