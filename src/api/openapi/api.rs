@@ -30,7 +30,7 @@ impl PlexoOpenAPI {
     }
 }
 
-#[OpenApi]
+#[OpenApi(prefix_path = "/api")]
 impl PlexoOpenAPI {
     #[oai(path = "/tasks", method = "post", tag = "PlexoAPITags::Task", operation_id = "create_task")]
     /// Creates a new task leveraging Plexo's AI-powered autonomous task generation.
