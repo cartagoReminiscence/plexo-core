@@ -13,6 +13,7 @@ use super::{
         tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
         teams::{TeamsGraphQLMutation, TeamsGraphQLQuery},
     },
+    processors::ai::AIProcessorGraphQLQuery,
 };
 
 #[derive(MergedObject, Default)]
@@ -23,6 +24,7 @@ pub struct QueryRoot(
     ProjectsGraphQLQuery,
     TeamsGraphQLQuery,
     MembersGraphQLQuery,
+    AIProcessorGraphQLQuery,
 );
 
 #[derive(MergedObject, Default)]

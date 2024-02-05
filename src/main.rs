@@ -21,20 +21,21 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let graphql_schema = core.graphql_api_schema();
 
-    let openapi_server = format!("{}/api", *DOMAIN);
+    let api_prefix = "/v1/api";
+
+    let openapi_server = format!("{}{}", *DOMAIN, api_prefix);
 
     let api_service = OpenApiService::new(PlexoOpenAPI::new(core.clone()), "Plexo Open API", "1.0").server(openapi_server);
 
-    let spec_handler = api_service.spec_endpoint();
+    let spec_json_handler = api_service.spec_endpoint();
     let spec_yaml_handler = api_service.spec_endpoint_yaml();
 
     let ui = api_service.swagger_ui();
-    // let server_key = Hmac::<Sha256>::new_from_slice(SERVER_KEY).expect("valid server key");
 
     let app = Route::new()
-        .nest("/api", api_service)
+        .nest(api_prefix, api_service)
         .nest("/", ui)
-        .at("/openapi.json", get(spec_handler))
+        .at("/openapi.json", get(spec_json_handler))
         .at("/openapi.yaml", get(spec_yaml_handler))
         // .nest("/", static_page)
         // Non authenticated routes
@@ -54,7 +55,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with(Cors::new().allow_credentials(true))
         .data(graphql_schema)
         .data(core.clone());
-    // .data(api_spec);
 
     println!("Visit GraphQL Playground at {}/playground", *DOMAIN);
 
