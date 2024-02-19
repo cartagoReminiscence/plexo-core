@@ -1,7 +1,6 @@
-use async_graphql::{Context, InputObject, Object, Result};
+use async_graphql::{Context, Object, Result};
 
-use plexo_sdk::resources::tasks::task::Task;
-use uuid::Uuid;
+use plexo_sdk::cognition::operations::{CognitionOperations, SubdivideTaskInput, TaskSuggestion, TaskSuggestionInput};
 
 use crate::api::graphql::commons::extract_context;
 
@@ -11,29 +10,23 @@ pub struct AIProcessorGraphQLQuery;
 #[derive(Default)]
 pub struct AIProcessorGraphQLMutation;
 
-#[derive(InputObject)]
-struct SuggestNextTaskInput {
-    project_id: Uuid,
-    query: Option<String>,
-}
-
-#[derive(InputObject)]
-struct SubdivideTaskInput {
-    task_id: Uuid,
-    #[graphql(default = 3)]
-    total_subtasks: u32,
-    query: Option<String>,
-}
-
 #[Object]
 impl AIProcessorGraphQLQuery {
-    async fn suggest_next_task(&self, ctx: &Context<'_>, _input: SuggestNextTaskInput) -> Result<Task> {
-        let (_core, _member_id) = extract_context(ctx)?;
-        todo!()
+    async fn suggest_next_task(&self, ctx: &Context<'_>, input: TaskSuggestionInput) -> Result<TaskSuggestion> {
+        let (core, _member_id) = extract_context(ctx)?;
+
+        core.engine
+            .get_suggestions(input)
+            .await
+            .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn subdivide_task(&self, ctx: &Context<'_>, _input: SubdivideTaskInput) -> Result<Vec<Task>> {
-        let (_core, _member_id) = extract_context(ctx)?;
-        todo!()
+    async fn subdivide_task(&self, ctx: &Context<'_>, input: SubdivideTaskInput) -> Result<Vec<TaskSuggestion>> {
+        let (core, _member_id) = extract_context(ctx)?;
+
+        core.engine
+            .subdivide_task(input)
+            .await
+            .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 }
