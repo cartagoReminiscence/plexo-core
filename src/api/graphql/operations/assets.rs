@@ -1,7 +1,7 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::assets::{
+use plexo_sdk::resources::assets::{
     asset::Asset,
     operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput},
 };
@@ -39,7 +39,10 @@ pub struct AssetsGraphQLMutation;
 impl AssetsGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
     async fn create_asset(&self, ctx: &Context<'_>, input: CreateAssetInput) -> Result<Asset> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
+
+        let mut input = input;
+        input.owner_id = member_id;
 
         core.engine
             .create_asset(input)

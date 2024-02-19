@@ -1,6 +1,6 @@
 use async_graphql::{Context, InputObject, Object, Result};
 
-use plexo_sdk::tasks::task::Task;
+use plexo_sdk::resources::tasks::task::Task;
 use uuid::Uuid;
 
 use crate::api::graphql::commons::extract_context;

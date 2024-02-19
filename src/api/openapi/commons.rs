@@ -17,4 +17,6 @@ pub enum PlexoAPITags {
     Label,
     /// Operations about assets
     Asset,
+    /// Operations about changes
+    Change,
 }

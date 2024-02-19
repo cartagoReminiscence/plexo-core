@@ -7,6 +7,7 @@ use super::{
     auth::AuthMutation,
     operations::{
         assets::{AssetsGraphQLMutation, AssetsGraphQLQuery},
+        changes::ChangesGraphQLQuery,
         labels::{LabelsGraphQLMutation, LabelsGraphQLQuery},
         members::{MembersGraphQLMutation, MembersGraphQLQuery},
         projects::{ProjectsGraphQLMutation, ProjectsGraphQLQuery},
@@ -24,6 +25,7 @@ pub struct QueryRoot(
     ProjectsGraphQLQuery,
     TeamsGraphQLQuery,
     MembersGraphQLQuery,
+    ChangesGraphQLQuery,
     AIProcessorGraphQLQuery,
 );
 
@@ -36,6 +38,7 @@ pub struct MutationRoot(
     ProjectsGraphQLMutation,
     TeamsGraphQLMutation,
     MembersGraphQLMutation,
+    // ChangesGraphQLMutation,
 );
 
 #[derive(MergedSubscription, Default)]

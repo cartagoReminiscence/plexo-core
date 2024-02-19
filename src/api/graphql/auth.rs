@@ -1,5 +1,5 @@
 use async_graphql::{Context, Object, Result, SimpleObject};
-use plexo_sdk::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
+use plexo_sdk::resources::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
 
 use crate::{core::app::Core, errors::app::PlexoAppError};
 

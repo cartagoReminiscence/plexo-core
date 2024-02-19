@@ -14,6 +14,7 @@ lazy_static! {
     pub static ref GITHUB_CLIENT_SECRET: Option<String> = var("GITHUB_CLIENT_SECRET").ok();
     pub static ref GITHUB_REDIRECT_URL: String = var("GITHUB_REDIRECT_URL").unwrap_or(format!("{}/auth/github/callback", *DOMAIN));
     //
+    pub static ref LLM_API_KEY: String = var("OPENAI_API_KEY").expect("OPENAI_API_KEY environment variable not set");
     pub static ref LLM_MODEL_NAME: String = var("LLM_MODEL_NAME").unwrap_or("gpt-3.5-turbo".into());
     //
     pub static ref ADMIN_EMAIL: String = var("ADMIN_EMAIL").unwrap_or("admin@plexo.app".into());

@@ -1,14 +1,16 @@
-use plexo_sdk::assets::asset::Asset;
-use plexo_sdk::assets::operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput};
-use plexo_sdk::labels::label::Label;
-use plexo_sdk::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput};
-use plexo_sdk::members::member::Member;
-use plexo_sdk::members::operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput};
-use plexo_sdk::projects::operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput};
-use plexo_sdk::tasks::operations::{CreateTaskInput, TaskCrudOperations, UpdateTaskInput};
-use plexo_sdk::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
-use plexo_sdk::teams::team::Team;
-use plexo_sdk::{projects::project::Project, tasks::task::Task};
+use plexo_sdk::resources::assets::asset::Asset;
+use plexo_sdk::resources::assets::operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput};
+use plexo_sdk::resources::changes::change::Change;
+use plexo_sdk::resources::changes::operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput};
+use plexo_sdk::resources::labels::label::Label;
+use plexo_sdk::resources::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput};
+use plexo_sdk::resources::members::member::Member;
+use plexo_sdk::resources::members::operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput};
+use plexo_sdk::resources::projects::operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput};
+use plexo_sdk::resources::tasks::operations::{CreateTaskInput, TaskCrudOperations, UpdateTaskInput};
+use plexo_sdk::resources::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
+use plexo_sdk::resources::teams::team::Team;
+use plexo_sdk::resources::{projects::project::Project, tasks::task::Task};
 use poem::Result;
 use poem_openapi::param::Path;
 use poem_openapi::payload::Json;
@@ -521,6 +523,96 @@ impl PlexoOpenAPI {
 
         Ok(DeleteAssetResponse::Ok(Json(asset)))
     }
+
+    #[oai(
+        path = "/changes",
+        method = "post",
+        tag = "PlexoAPITags::Change",
+        operation_id = "create_change"
+    )]
+    /// Introduces a new change to Plexo, enhancing project categorization and task prioritization.
+    /// This function is essential for maintaining organized and efficient project workflows.
+    async fn create_change(&self, input: Json<CreateChangeInput>, _auth: PlexoAPIKeyAuthorization) -> Result<CreateChangeResponse> {
+        let change = self
+            .core
+            .engine
+            .create_change(input.0)
+            .await
+            .map_err(PlexoAppError::SDKError)?;
+
+        Ok(CreateChangeResponse::Ok(Json(change)))
+    }
+
+    #[oai(
+        path = "/changes/:id",
+        method = "get",
+        tag = "PlexoAPITags::Change",
+        operation_id = "get_change"
+    )]
+    /// Retrieves specific details about a change, utilizing Plexo's structured approach to task and project organization.
+    /// This function aids in understanding the role and impact of changes within project management.
+    async fn get_change(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<GetChangeResponse> {
+        let change = self.core.engine.get_change(id.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(GetChangeResponse::Ok(Json(change)))
+    }
+
+    #[oai(
+        path = "/changes",
+        method = "get",
+        tag = "PlexoAPITags::Change",
+        operation_id = "get_changes"
+    )]
+    /// Compiles a list of all changes in Plexo, showcasing the platform's comprehensive categorization capabilities.
+    /// This function is vital for overseeing task organization and project prioritization.
+    async fn get_changes(&self, _auth: PlexoAPIKeyAuthorization) -> Result<GetChangesResponse> {
+        let changes = self
+            .core
+            .engine
+            .get_changes(GetChangesInput::default())
+            .await
+            .map_err(PlexoAppError::SDKError)?;
+
+        Ok(GetChangesResponse::Ok(Json(changes)))
+    }
+
+    #[oai(
+        path = "/changes/:id",
+        method = "put",
+        tag = "PlexoAPITags::Change",
+        operation_id = "update_change"
+    )]
+    /// Updates an existing change's information, ensuring its relevance and effectiveness in project categorization.
+    /// This function is key to maintaining an organized and efficient project management system.
+    async fn update_change(
+        &self,
+        id: Path<Uuid>,
+        input: Json<UpdateChangeInput>,
+        _auth: PlexoAPIKeyAuthorization,
+    ) -> Result<UpdateChangeResponse> {
+        let change = self
+            .core
+            .engine
+            .update_change(id.0, input.0)
+            .await
+            .map_err(PlexoAppError::SDKError)?;
+
+        Ok(UpdateChangeResponse::Ok(Json(change)))
+    }
+
+    #[oai(
+        path = "/changes/:id",
+        method = "delete",
+        tag = "PlexoAPITags::Change",
+        operation_id = "delete_change"
+    )]
+    /// Deletes a change from Plexo, streamlining the categorization system to focus on current and active changes.
+    /// This function is important for maintaining clarity and efficiency in project organization.
+    async fn delete_change(&self, id: Path<Uuid>, _auth: PlexoAPIKeyAuthorization) -> Result<DeleteChangeResponse> {
+        let change = self.core.engine.delete_change(id.0).await.map_err(PlexoAppError::SDKError)?;
+
+        Ok(DeleteChangeResponse::Ok(Json(change)))
+    }
 }
 
 //
@@ -807,6 +899,55 @@ enum DeleteAssetResponse {
     /// Returns when the user is successfully created.
     #[oai(status = 200)]
     Ok(Json<Asset>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+//
+//
+//
+
+//
+//
+//
+
+#[derive(ApiResponse)]
+enum CreateChangeResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Change>),
+}
+
+#[derive(ApiResponse)]
+enum GetChangesResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Vec<Change>>),
+}
+
+#[derive(ApiResponse)]
+enum GetChangeResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Change>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+#[derive(ApiResponse)]
+enum UpdateChangeResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Change>),
+    // #[oai(status = 404)]
+    // NotFound,
+}
+
+#[derive(ApiResponse)]
+enum DeleteChangeResponse {
+    /// Returns when the user is successfully created.
+    #[oai(status = 200)]
+    Ok(Json<Change>),
     // #[oai(status = 404)]
     // NotFound,
 }

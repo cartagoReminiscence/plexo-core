@@ -1,7 +1,7 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::labels::{
+use plexo_sdk::resources::labels::{
     label::Label,
     operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput},
 };

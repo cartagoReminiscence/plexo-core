@@ -1,80 +1,80 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::projects::{
-    operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput},
-    project::Project,
+use plexo_sdk::resources::changes::{
+    change::Change,
+    operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput},
 };
 use tokio_stream::Stream;
 use uuid::Uuid;
 
 #[derive(Default)]
-pub struct ProjectsGraphQLQuery;
+pub struct ChangesGraphQLQuery;
 
 #[Object]
-impl ProjectsGraphQLQuery {
-    async fn projects(&self, ctx: &Context<'_>, input: Option<GetProjectsInput>) -> Result<Vec<Project>> {
+impl ChangesGraphQLQuery {
+    async fn changes(&self, ctx: &Context<'_>, input: Option<GetChangesInput>) -> Result<Vec<Change>> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_projects(input.unwrap_or_default())
+            .get_changes(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
+    async fn change(&self, ctx: &Context<'_>, id: Uuid) -> Result<Change> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .get_project(id)
+            .get_change(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 }
 
 #[derive(Default)]
-pub struct ProjectsGraphQLMutation;
+pub struct ChangesGraphQLMutation;
 
 #[Object]
-impl ProjectsGraphQLMutation {
+impl ChangesGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
-    async fn create_project(&self, ctx: &Context<'_>, input: CreateProjectInput) -> Result<Project> {
+    async fn create_change(&self, ctx: &Context<'_>, input: CreateChangeInput) -> Result<Change> {
         let (core, member_id) = extract_context(ctx)?;
 
         let mut input = input;
         input.owner_id = member_id;
 
         core.engine
-            .create_project(input)
+            .create_change(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn update_project(&self, ctx: &Context<'_>, id: Uuid, input: UpdateProjectInput) -> Result<Project> {
+    async fn update_change(&self, ctx: &Context<'_>, id: Uuid, input: UpdateChangeInput) -> Result<Change> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .update_project(id, input)
+            .update_change(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn delete_project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
+    async fn delete_change(&self, ctx: &Context<'_>, id: Uuid) -> Result<Change> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
-            .delete_project(id)
+            .delete_change(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 }
 
 #[derive(Default)]
-pub struct ProjectsGraphQLSubscription;
+pub struct ChangesGraphQLSubscription;
 
 #[Subscription]
-impl ProjectsGraphQLSubscription {
-    async fn events_project(&self) -> impl Stream<Item = i32> {
+impl ChangesGraphQLSubscription {
+    async fn events_change(&self) -> impl Stream<Item = i32> {
         futures_util::stream::iter(0..10)
     }
 }

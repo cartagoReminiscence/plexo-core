@@ -1,10 +1,10 @@
 use async_graphql::Error;
 use chrono::{Duration, Utc};
 use oauth2::{AuthorizationCode, CsrfToken};
-use plexo_sdk::members::extensions::{
+use plexo_sdk::resources::members::extensions::{
     CreateMemberFromEmailInputBuilder, CreateMemberFromGithubInputBuilder, MembersExtensionOperations,
 };
-use plexo_sdk::members::member::Member;
+use plexo_sdk::resources::members::member::Member;
 
 use poem::http::header::{CACHE_CONTROL, EXPIRES, LOCATION, PRAGMA, SET_COOKIE};
 use poem::http::{HeaderMap, StatusCode};

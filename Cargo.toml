@@ -1,28 +1,28 @@
 [package]
 name = "plexo-core"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plexo-sdk = "0.2.14"
+plexo-sdk = "0.3.1"
 uuid = "1.7.0"
-chrono = "0.4.33"
+chrono = "0.4.34"
 jsonwebtoken = "9.2.0"
 serde = "1.0.196"
 argon2 = "0.5.3"
 oauth2 = "4.4.2"
 serde_json = "1.0.113"
-thiserror = "1.0.56"
+thiserror = "1.0.57"
 cookie = "0.18.0"
 dotenv = "0.15.0"
-async-graphql-poem = "7.0.1"
+async-graphql-poem = "7.0.2"
 lazy_static = "1.4.0"
 tokio-stream = "0.1.14"
 futures-util = "0.3.30"
 tokio = { version = "1.36.0", features = ["full"] }
-async-graphql = { version = "7.0.1", features = [
+async-graphql = { version = "7.0.2", features = [
     "decimal",
     "chrono",
     "dataloader",

@@ -1,7 +1,7 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::members::{
+use plexo_sdk::resources::members::{
     member::Member,
     operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput},
 };

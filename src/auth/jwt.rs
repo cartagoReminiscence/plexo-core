@@ -1,6 +1,6 @@
 use chrono::Utc;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use plexo_sdk::members::member::Member;
+use plexo_sdk::resources::members::member::Member;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

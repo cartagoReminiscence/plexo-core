@@ -1,7 +1,7 @@
 use crate::api::graphql::commons::extract_context;
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::tasks::{
+use plexo_sdk::resources::tasks::{
     operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
     task::Task,
 };
@@ -38,9 +38,10 @@ pub struct TasksGraphQLMutation;
 #[Object]
 impl TasksGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
-    async fn create_task(&self, ctx: &Context<'_>, mut input: CreateTaskInput) -> Result<Task> {
+    async fn create_task(&self, ctx: &Context<'_>, input: CreateTaskInput) -> Result<Task> {
         let (core, member_id) = extract_context(ctx)?;
 
+        let mut input = input;
         input.owner_id = member_id;
 
         core.engine
