@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::projects::Project};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::projects::{
-    operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput},
-    project::Project,
-};
+use plexo_sdk::resources::projects::operations::{CreateProjectInput, GetProjectsInput, ProjectCrudOperations, UpdateProjectInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl ProjectsGraphQLQuery {
             .get_projects(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|projects| projects.into_iter().map(|project| project.into()).collect())
     }
 
     async fn project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
@@ -29,6 +27,7 @@ impl ProjectsGraphQLQuery {
             .get_project(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|project| project.into())
     }
 }
 
@@ -48,6 +47,7 @@ impl ProjectsGraphQLMutation {
             .create_project(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|project| project.into())
     }
 
     async fn update_project(&self, ctx: &Context<'_>, id: Uuid, input: UpdateProjectInput) -> Result<Project> {
@@ -57,6 +57,7 @@ impl ProjectsGraphQLMutation {
             .update_project(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|project| project.into())
     }
 
     async fn delete_project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
@@ -66,6 +67,7 @@ impl ProjectsGraphQLMutation {
             .delete_project(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|project| project.into())
     }
 }
 

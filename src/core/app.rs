@@ -1,4 +1,9 @@
-use plexo_sdk::backend::engine::{new_postgres_engine, SDKEngine};
+use std::sync::Arc;
+
+use plexo_sdk::backend::{
+    engine::{new_postgres_engine, SDKEngine},
+    loaders::SDKLoaders,
+};
 
 use crate::{auth::engine::AuthEngine, errors::app::PlexoAppError};
 
@@ -10,6 +15,7 @@ use super::config::{
 pub struct Core {
     pub engine: SDKEngine,
     pub auth: AuthEngine,
+    pub loaders: Arc<SDKLoaders>,
 }
 
 pub async fn new_core_from_env() -> Result<Core, PlexoAppError> {
@@ -21,6 +27,10 @@ pub async fn new_core_from_env() -> Result<Core, PlexoAppError> {
     )
     .await?;
 
+    let arc_engine = Arc::new(engine.clone());
+
+    let loaders = Arc::new(SDKLoaders::new(arc_engine));
+
     let auth = AuthEngine::new(
         (*JWT_ACCESS_TOKEN_SECRET).to_string(),
         (*JWT_ACCESS_TOKEN_SECRET).to_string(),
@@ -29,5 +39,5 @@ pub async fn new_core_from_env() -> Result<Core, PlexoAppError> {
         Some((*GITHUB_REDIRECT_URL).to_owned()),
     );
 
-    Ok(Core { engine, auth })
+    Ok(Core { engine, auth, loaders })
 }

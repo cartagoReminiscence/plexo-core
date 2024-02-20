@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::tasks::Task};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::tasks::{
-    operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
-    task::Task,
-};
+use plexo_sdk::resources::tasks::operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl TasksGraphQLQuery {
             .get_tasks(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|tasks| tasks.into_iter().map(|task| task.into()).collect())
     }
 
     async fn task(&self, ctx: &Context<'_>, id: Uuid) -> Result<Task> {
@@ -29,6 +27,7 @@ impl TasksGraphQLQuery {
             .get_task(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|task| task.into())
     }
 }
 
@@ -48,6 +47,7 @@ impl TasksGraphQLMutation {
             .create_task(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|task| task.into())
     }
 
     async fn update_task(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTaskInput) -> Result<Task> {
@@ -57,6 +57,7 @@ impl TasksGraphQLMutation {
             .update_task(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|task| task.into())
     }
 
     async fn delete_task(&self, ctx: &Context<'_>, id: Uuid) -> Result<Task> {
@@ -66,6 +67,7 @@ impl TasksGraphQLMutation {
             .delete_task(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|task| task.into())
     }
 }
 
