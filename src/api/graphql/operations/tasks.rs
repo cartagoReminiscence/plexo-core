@@ -49,8 +49,8 @@ impl TasksGraphQLMutation {
         core.engine
             .create_task(input)
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
             .map(|task| task.into())
+            .map_err(|err| err.into())
     }
 
     async fn create_tasks(&self, ctx: &Context<'_>, input: CreateTasksInput) -> Result<Vec<Task>> {

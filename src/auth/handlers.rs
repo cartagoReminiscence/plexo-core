@@ -85,8 +85,8 @@ pub async fn github_callback_handler(plexo_core: Data<&Core>, params: Query<Gith
         .unwrap();
 
     let member: Member = match plexo_core.0.engine.get_member_by_github_id(github_id.clone()).await {
-        Ok(member) => member,
-        Err(_) => plexo_core
+        Ok(Some(member)) => member,
+        Ok(None) | Err(_) => plexo_core
             .0
             .engine
             .create_member_from_github(
@@ -148,7 +148,7 @@ pub fn logout() -> impl IntoResponse {
 
 #[handler]
 pub async fn email_basic_login_handler(plexo_engine: Data<&Core>, params: Json<EmailLoginParams>) -> impl IntoResponse {
-    let Ok(member) = plexo_engine.0.engine.get_member_by_email(params.email.clone()).await else {
+    let Ok(Some(member)) = plexo_engine.0.engine.get_member_by_email(params.email.clone()).await else {
         return Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .header("Content-Type", "application/json")

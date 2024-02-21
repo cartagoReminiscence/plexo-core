@@ -19,6 +19,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let core = new_core_from_env().await?;
 
+    core.prelude().await?;
+
     let graphql_schema = core.graphql_api_schema();
 
     let api_prefix = "/v1/api";

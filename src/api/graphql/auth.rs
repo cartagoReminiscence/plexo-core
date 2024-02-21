@@ -19,7 +19,7 @@ impl AuthMutation {
     async fn login(&self, ctx: &Context<'_>, email: String, password: String) -> Result<LoginResponse> {
         let plexo_engine = ctx.data::<Core>()?.to_owned();
 
-        let Ok(member) = plexo_engine.engine.get_member_by_email(email.clone()).await else {
+        let Ok(Some(member)) = plexo_engine.engine.get_member_by_email(email.clone()).await else {
             return Err(PlexoAppError::EmailNotFound.into());
         };
 
