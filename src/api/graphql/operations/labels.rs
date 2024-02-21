@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::labels::Label};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::labels::{
-    label::Label,
-    operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput},
-};
+use plexo_sdk::resources::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl LabelsGraphQLQuery {
             .get_labels(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|labels| labels.into_iter().map(|label| label.into()).collect())
     }
 
     async fn label(&self, ctx: &Context<'_>, id: Uuid) -> Result<Label> {
@@ -29,6 +27,7 @@ impl LabelsGraphQLQuery {
             .get_label(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|label| label.into())
     }
 }
 
@@ -45,6 +44,7 @@ impl LabelsGraphQLMutation {
             .create_label(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|label| label.into())
     }
 
     async fn update_label(&self, ctx: &Context<'_>, id: Uuid, input: UpdateLabelInput) -> Result<Label> {
@@ -54,6 +54,7 @@ impl LabelsGraphQLMutation {
             .update_label(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|label| label.into())
     }
 
     async fn delete_label(&self, ctx: &Context<'_>, id: Uuid) -> Result<Label> {
@@ -63,6 +64,7 @@ impl LabelsGraphQLMutation {
             .delete_label(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|label| label.into())
     }
 }
 

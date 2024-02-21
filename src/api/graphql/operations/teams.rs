@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::teams::Team};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::teams::{
-    operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput},
-    team::Team,
-};
+use plexo_sdk::resources::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl TeamsGraphQLQuery {
             .get_teams(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|teams| teams.into_iter().map(|team| team.into()).collect())
     }
 
     async fn team(&self, ctx: &Context<'_>, id: Uuid) -> Result<Team> {
@@ -29,6 +27,7 @@ impl TeamsGraphQLQuery {
             .get_team(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|team| team.into())
     }
 }
 
@@ -48,6 +47,7 @@ impl TeamsGraphQLMutation {
             .create_team(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|team| team.into())
     }
 
     async fn update_team(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTeamInput) -> Result<Team> {
@@ -57,6 +57,7 @@ impl TeamsGraphQLMutation {
             .update_team(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|team| team.into())
     }
 
     async fn delete_team(&self, ctx: &Context<'_>, id: Uuid) -> Result<Team> {
@@ -66,6 +67,7 @@ impl TeamsGraphQLMutation {
             .delete_team(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|team| team.into())
     }
 }
 

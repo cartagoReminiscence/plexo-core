@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::changes::Change};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::changes::{
-    change::Change,
-    operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput},
-};
+use plexo_sdk::resources::changes::operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl ChangesGraphQLQuery {
             .get_changes(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|changes| changes.into_iter().map(|change| change.into()).collect())
     }
 
     async fn change(&self, ctx: &Context<'_>, id: Uuid) -> Result<Change> {
@@ -29,6 +27,7 @@ impl ChangesGraphQLQuery {
             .get_change(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|change| change.into())
     }
 }
 
@@ -48,6 +47,7 @@ impl ChangesGraphQLMutation {
             .create_change(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|change| change.into())
     }
 
     async fn update_change(&self, ctx: &Context<'_>, id: Uuid, input: UpdateChangeInput) -> Result<Change> {
@@ -57,6 +57,7 @@ impl ChangesGraphQLMutation {
             .update_change(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|change| change.into())
     }
 
     async fn delete_change(&self, ctx: &Context<'_>, id: Uuid) -> Result<Change> {
@@ -66,6 +67,7 @@ impl ChangesGraphQLMutation {
             .delete_change(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|change| change.into())
     }
 }
 

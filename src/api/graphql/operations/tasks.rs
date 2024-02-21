@@ -1,7 +1,10 @@
 use crate::api::graphql::{commons::extract_context, resources::tasks::Task};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::tasks::operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput};
+use plexo_sdk::resources::tasks::{
+    extensions::{CreateTasksInput, TasksExtensionOperations},
+    operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
+};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -48,6 +51,16 @@ impl TasksGraphQLMutation {
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
             .map(|task| task.into())
+    }
+
+    async fn create_tasks(&self, ctx: &Context<'_>, input: CreateTasksInput) -> Result<Vec<Task>> {
+        let (core, _member_id) = extract_context(ctx)?;
+
+        core.engine
+            .create_tasks(input)
+            .await
+            .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|tasks| tasks.into_iter().map(|task| task.into()).collect())
     }
 
     async fn update_task(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTaskInput) -> Result<Task> {

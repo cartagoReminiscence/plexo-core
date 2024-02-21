@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::assets::Asset};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::assets::{
-    asset::Asset,
-    operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput},
-};
+use plexo_sdk::resources::assets::operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl AssetsGraphQLQuery {
             .get_assets(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|assets| assets.into_iter().map(|asset| asset.into()).collect())
     }
 
     async fn asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
@@ -29,6 +27,7 @@ impl AssetsGraphQLQuery {
             .get_asset(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|asset| asset.into())
     }
 }
 
@@ -48,6 +47,7 @@ impl AssetsGraphQLMutation {
             .create_asset(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|asset| asset.into())
     }
 
     async fn update_asset(&self, ctx: &Context<'_>, id: Uuid, input: UpdateAssetInput) -> Result<Asset> {
@@ -57,6 +57,7 @@ impl AssetsGraphQLMutation {
             .update_asset(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|asset| asset.into())
     }
 
     async fn delete_asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
@@ -66,6 +67,7 @@ impl AssetsGraphQLMutation {
             .delete_asset(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|asset| asset.into())
     }
 }
 

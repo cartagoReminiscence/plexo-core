@@ -1,10 +1,7 @@
-use crate::api::graphql::commons::extract_context;
+use crate::api::graphql::{commons::extract_context, resources::members::Member};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::members::{
-    member::Member,
-    operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput},
-};
+use plexo_sdk::resources::members::operations::{CreateMemberInput, GetMembersInput, MemberCrudOperations, UpdateMemberInput};
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -20,6 +17,7 @@ impl MembersGraphQLQuery {
             .get_members(input.unwrap_or_default())
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|members| members.into_iter().map(|member| member.into()).collect())
     }
 
     async fn member(&self, ctx: &Context<'_>, id: Uuid) -> Result<Member> {
@@ -29,6 +27,7 @@ impl MembersGraphQLQuery {
             .get_member(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|member| member.into())
     }
 }
 
@@ -44,6 +43,7 @@ impl MembersGraphQLMutation {
             .create_member(input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|member| member.into())
     }
 
     async fn update_member(&self, ctx: &Context<'_>, id: Uuid, input: UpdateMemberInput) -> Result<Member> {
@@ -53,6 +53,7 @@ impl MembersGraphQLMutation {
             .update_member(id, input)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|member| member.into())
     }
 
     async fn delete_member(&self, ctx: &Context<'_>, id: Uuid) -> Result<Member> {
@@ -62,6 +63,7 @@ impl MembersGraphQLMutation {
             .delete_member(id)
             .await
             .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|member| member.into())
     }
 }
 
