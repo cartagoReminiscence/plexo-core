@@ -11,6 +11,8 @@ lazy_static! {
     //
     pub static ref COOKIE_SESSION_DOMAIN: String = var("COOKIE_SESSION_DOMAIN").unwrap_or(format!(".{}", *HOST));
     pub static ref COOKIE_SESSION_NAME: String = var("COOKIE_SESSION_NAME").unwrap_or("plexo-session-token".into());
+    pub static ref COOKIE_SESSION_SECURE: String = var("COOKIE_SESSION_SECURE").unwrap_or("false".into());
+    pub static ref COOKIE_SESSION_SAME_SITE: String = var("COOKIE_SESSION_SAME_SITE").unwrap_or("none".into());
     //
     pub static ref DATABASE_URL: String = var("DATABASE_URL").expect("DATABASE_URL environment variable not set");
     pub static ref GITHUB_CLIENT_ID: Option<String> = var("GITHUB_CLIENT_ID").ok();

@@ -30,14 +30,14 @@ impl Project {
             .map(|member| member.into())
     }
 
-    async fn lead(&self, ctx: &Context<'_>) -> Result<Member> {
+    async fn lead(&self, ctx: &Context<'_>) -> Result<Option<Member>> {
         let (plexo_engine, _member_id) = extract_context(ctx)?;
 
         self.project
             .lead(&plexo_engine.loaders)
             .await
             .map_err(|e| e.into())
-            .map(|member| member.into())
+            .map(|member| member.map(|member| member.into()))
     }
 
     async fn tasks(&self, ctx: &Context<'_>) -> Result<Vec<Task>> {
