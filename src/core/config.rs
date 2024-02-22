@@ -9,6 +9,9 @@ lazy_static! {
     pub static ref SCHEMA: String = var("SCHEMA").unwrap_or("http".into());
     pub static ref DOMAIN: String = var("DOMAIN").unwrap_or(format!("{}://{}", *SCHEMA, *URL));
     //
+    pub static ref COOKIE_SESSION_DOMAIN: String = var("COOKIE_SESSION_DOMAIN").unwrap_or(format!(".{}", *HOST));
+    pub static ref COOKIE_SESSION_NAME: String = var("COOKIE_SESSION_NAME").unwrap_or("plexo-session-token".into());
+    //
     pub static ref DATABASE_URL: String = var("DATABASE_URL").expect("DATABASE_URL environment variable not set");
     pub static ref GITHUB_CLIENT_ID: Option<String> = var("GITHUB_CLIENT_ID").ok();
     pub static ref GITHUB_CLIENT_SECRET: Option<String> = var("GITHUB_CLIENT_SECRET").ok();

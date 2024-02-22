@@ -16,11 +16,12 @@ use serde_json::{json, Value};
 
 use crate::api::openapi::commons::PlexoOpenAPISpecs;
 use crate::core::app::Core;
+use crate::core::config::{COOKIE_SESSION_DOMAIN, COOKIE_SESSION_NAME};
 use crate::errors::app::PlexoAppError;
 
 use super::resources::PlexoAuthToken;
 use super::{
-    commons::{get_token_from_cookie, get_token_from_headers, COOKIE_SESSION_TOKEN_NAME, GITHUB_USER_API},
+    commons::{get_token_from_cookie, get_token_from_headers, GITHUB_USER_API},
     resources::{EmailLoginParams, EmailRegisterParams, GithubCallbackParams},
 };
 
@@ -108,7 +109,7 @@ pub async fn github_callback_handler(plexo_core: Data<&Core>, params: Query<Gith
             .body(Body::from_json(&Error::new("Internal Server Error")).unwrap());
     };
 
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_TOKEN_NAME);
+    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
     session_token_cookie.set_value_str(session_token);
     session_token_cookie.set_http_only(true);
@@ -129,7 +130,7 @@ pub async fn github_callback_handler(plexo_core: Data<&Core>, params: Query<Gith
 
 #[handler]
 pub fn logout() -> impl IntoResponse {
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_TOKEN_NAME);
+    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
     session_token_cookie.set_value_str("");
     session_token_cookie.set_http_only(true);
@@ -194,13 +195,15 @@ pub async fn email_basic_login_handler(plexo_engine: Data<&Core>, params: Json<E
             .body(Body::from_json(&Error::new("Internal Server Error")).unwrap());
     };
 
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_TOKEN_NAME);
+    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
+    let cookie_domain = &COOKIE_SESSION_DOMAIN.to_string();
 
     session_token_cookie.set_value_str(session_token.clone());
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
     session_token_cookie.set_same_site(SameSite::Lax);
     session_token_cookie.set_expires(Utc::now() + Duration::days(7));
+    session_token_cookie.set_domain(cookie_domain);
     session_token_cookie.set_path("/");
 
     Response::builder()
@@ -272,7 +275,7 @@ pub async fn email_basic_register_handler(
             .body(Body::from_json(&Error::new("Internal Server Error")).unwrap()));
     };
 
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_TOKEN_NAME);
+    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
     session_token_cookie.set_value_str(session_token.clone());
     session_token_cookie.set_http_only(true);
@@ -291,7 +294,7 @@ pub async fn email_basic_register_handler(
 #[handler]
 pub async fn logout_handler() -> Result<Response> {
     // plexo_engine: Data<&Engine>
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_TOKEN_NAME);
+    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
     session_token_cookie.set_value_str("");
     session_token_cookie.set_http_only(true);

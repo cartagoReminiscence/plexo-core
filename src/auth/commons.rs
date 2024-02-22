@@ -1,9 +1,10 @@
+use crate::core::config::COOKIE_SESSION_NAME;
+
 use super::resources::PlexoAuthToken;
 use cookie::Cookie;
 use poem::http::HeaderMap;
 
 pub const GITHUB_USER_API: &str = "https://api.github.com/user";
-pub const COOKIE_SESSION_TOKEN_NAME: &str = "plexo-session-token";
 
 pub fn get_token_from_headers(headers: &HeaderMap) -> Option<PlexoAuthToken> {
     headers
@@ -24,7 +25,7 @@ pub fn get_token_from_raw_cookie(raw_cookie: &str) -> Option<PlexoAuthToken> {
             continue;
         };
 
-        if cookie.name() == COOKIE_SESSION_TOKEN_NAME {
+        if cookie.name() == COOKIE_SESSION_NAME.to_string() {
             return Some(PlexoAuthToken(cookie.value().to_string()));
         }
     }
