@@ -4,12 +4,13 @@ use async_graphql::{MergedObject, MergedSubscription, Schema};
 use crate::core::app::Core;
 
 use super::{
-    auth::AuthMutation,
     operations::{
         assets::{AssetsGraphQLMutation, AssetsGraphQLQuery},
+        auth::AuthMutation,
         changes::ChangesGraphQLQuery,
         labels::{LabelsGraphQLMutation, LabelsGraphQLQuery},
         members::{MembersGraphQLMutation, MembersGraphQLQuery},
+        profile::{ProfileGraphQLMutation, ProfileGraphQLQuery},
         projects::{ProjectsGraphQLMutation, ProjectsGraphQLQuery},
         tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
         teams::{TeamsGraphQLMutation, TeamsGraphQLQuery},
@@ -27,6 +28,7 @@ pub struct QueryRoot(
     MembersGraphQLQuery,
     ChangesGraphQLQuery,
     AIProcessorGraphQLQuery,
+    ProfileGraphQLQuery,
 );
 
 #[derive(MergedObject, Default)]
@@ -38,6 +40,7 @@ pub struct MutationRoot(
     ProjectsGraphQLMutation,
     TeamsGraphQLMutation,
     MembersGraphQLMutation,
+    ProfileGraphQLMutation,
     // ChangesGraphQLMutation,
 );
 

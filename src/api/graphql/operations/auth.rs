@@ -1,9 +1,7 @@
 use async_graphql::{Context, Object, Result, SimpleObject};
 use plexo_sdk::resources::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
 
-use crate::{core::app::Core, errors::app::PlexoAppError};
-
-use super::commons::extract_context;
+use crate::{api::graphql::commons::extract_context, core::app::Core, errors::app::PlexoAppError};
 
 #[derive(Default)]
 pub struct AuthMutation;
