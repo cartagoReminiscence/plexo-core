@@ -54,7 +54,10 @@ impl TasksGraphQLMutation {
     }
 
     async fn create_tasks(&self, ctx: &Context<'_>, input: CreateTasksInput) -> Result<Vec<Task>> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
+
+        let mut input = input;
+        input.tasks.iter_mut().for_each(|task| task.owner_id = member_id);
 
         core.engine
             .create_tasks(input)

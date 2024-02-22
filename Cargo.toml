@@ -1,12 +1,12 @@
 [package]
 name = "plexo-core"
-version = "0.1.12"
+version = "0.1.13"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plexo-sdk = "0.4.2"
+plexo-sdk = "0.4.3"
 uuid = "1.7.0"
 chrono = "0.4.34"
 jsonwebtoken = "9.2.0"
