@@ -16,7 +16,7 @@ use serde_json::{json, Value};
 
 use crate::api::openapi::commons::PlexoOpenAPISpecs;
 use crate::core::app::Core;
-use crate::core::config::{COOKIE_SESSION_DOMAIN, COOKIE_SESSION_NAME};
+use crate::core::config::COOKIE_SESSION_NAME; // COOKIE_SESSION_DOMAIN,
 use crate::errors::app::PlexoAppError;
 
 use super::resources::PlexoAuthToken;
@@ -196,14 +196,14 @@ pub async fn email_basic_login_handler(plexo_engine: Data<&Core>, params: Json<E
     };
 
     let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
-    let cookie_domain = &COOKIE_SESSION_DOMAIN.to_string();
+    // let cookie_domain = &COOKIE_SESSION_DOMAIN.to_string();
 
     session_token_cookie.set_value_str(session_token.clone());
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
-    session_token_cookie.set_same_site(SameSite::Lax);
+    session_token_cookie.set_same_site(SameSite::None);
     session_token_cookie.set_expires(Utc::now() + Duration::days(7));
-    session_token_cookie.set_domain(cookie_domain);
+    // session_token_cookie.set_domain(cookie_domain);
     session_token_cookie.set_path("/");
 
     Response::builder()

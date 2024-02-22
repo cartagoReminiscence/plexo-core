@@ -1,0 +1,2 @@
+[tasks.depot]
+script = "depot build --platform linux/amd64 --tag minskylab/plexo-core:v${CARGO_MAKE_CRATE_VERSION} --push ."
