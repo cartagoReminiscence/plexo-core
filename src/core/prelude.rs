@@ -14,9 +14,17 @@ impl Core {
         let default_admin_name = (*ADMIN_NAME).clone();
         let default_admin_photo_url = (*ADMIN_PHOTO_URL).clone();
 
-        if let Ok(Some(_admin)) = self.engine.get_member_by_email(default_admin_email.clone()).await {
-            return Ok(());
-        };
+        match self.engine.get_member_by_email(default_admin_email.clone()).await {
+            Ok(Some(_admin)) => {
+                println!("Default admin user already exists: {}", default_admin_email);
+                return Ok(());
+            }
+            Err(e) => {
+                println!("Error checking for default admin user: {}", e);
+                return Err(Box::new(e));
+            }
+            _ => {}
+        }
 
         println!("Creating default admin user: {}", default_admin_email);
 
