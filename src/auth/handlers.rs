@@ -270,11 +270,14 @@ pub async fn logout_handler() -> Result<Response> {
     // plexo_engine: Data<&Engine>
     let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
+    let cookie_domain = COOKIE_SESSION_DOMAIN.to_string();
+
     session_token_cookie.set_value_str("");
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
     session_token_cookie.set_same_site(SameSite::Strict);
     session_token_cookie.set_expires(Utc::now() - Duration::days(1));
+    session_token_cookie.set_domain(cookie_domain);
     session_token_cookie.set_path("/");
 
     Ok(Response::builder()
@@ -284,21 +287,21 @@ pub async fn logout_handler() -> Result<Response> {
         .body(Body::from_json(json!({ "access_token": "" })).unwrap()))
 }
 
-#[handler]
-pub async fn logout() -> impl IntoResponse {
-    let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
+// #[handler]
+// pub async fn logout() -> impl IntoResponse {
+//     let mut session_token_cookie = Cookie::named(COOKIE_SESSION_NAME.to_string());
 
-    session_token_cookie.set_value_str("");
-    session_token_cookie.set_http_only(true);
-    session_token_cookie.set_secure(true);
-    session_token_cookie.set_same_site(SameSite::Strict);
-    session_token_cookie.set_expires(Utc::now() - Duration::days(1));
-    session_token_cookie.set_path("/");
+//     session_token_cookie.set_value_str("");
+//     session_token_cookie.set_http_only(true);
+//     session_token_cookie.set_secure(true);
+//     session_token_cookie.set_same_site(SameSite::Strict);
+//     session_token_cookie.set_expires(Utc::now() - Duration::days(1));
+//     session_token_cookie.set_path("/");
 
-    Redirect::moved_permanent("/")
-        .with_header("Set-Cookie", session_token_cookie.to_string())
-        .with_header(CACHE_CONTROL, "no-cache, no-store, must-revalidate")
-        .with_header(PRAGMA, "no-cache")
-        .with_header(EXPIRES, "0")
-        .into_response()
-}
+//     Redirect::moved_permanent("/")
+//         .with_header("Set-Cookie", session_token_cookie.to_string())
+//         .with_header(CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+//         .with_header(PRAGMA, "no-cache")
+//         .with_header(EXPIRES, "0")
+//         .into_response()
+// }
