@@ -6,12 +6,11 @@ use plexo_core::{
     auth::handlers::{email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler},
     core::{
         app::new_core_from_env,
-        config::{DOMAIN, URL, CERT_PEM_PATH, KEY_PEM_PATH},
+        config::{DOMAIN, URL},
     },
     handlers::{graphiq_handler, index_handler, ws_switch_handler},
 };
-use poem::{get, listener::{Listener, TcpListener}, middleware::Cors, post, EndpointExt, Route, Server};
-use poem::listener::{RustlsCertificate, RustlsConfig };
+use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Route, Server};
 use poem_openapi::OpenApiService;
 
 #[tokio::main]
@@ -60,34 +59,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .data(core.clone());
 
     println!("Visit GraphQL Playground at {}/playground", *DOMAIN);
-    
-    if CERT_PEM_PATH.to_string() != "none"
-    {
-        let cert_content = std::fs::read(CERT_PEM_PATH.to_string()).expect("Error al leer el certificado");
-    
-        let key_content = std::fs::read(KEY_PEM_PATH.to_string()).expect("Error al leer la clave privada");
-    
-        let rustls_cert = RustlsCertificate::new()
-        .cert(cert_content)
-        .key(key_content);
-    
-        let config =
-        RustlsConfig::new().fallback(rustls_cert);
-        let listener = TcpListener::bind(URL.to_owned()).rustls(config);
-        Server::new(listener)
+
+    Server::new(TcpListener::bind(URL.to_owned()))
         .run(app)
         .await
         .expect("Fail to start web server");
-
-    }
-    else{
-        let listener = TcpListener::bind(URL.to_owned());
-        Server::new(listener)
-        .run(app)
-        .await
-        .expect("Fail to start web server");
-
-    }
 
     Ok(())
 }
