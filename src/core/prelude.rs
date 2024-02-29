@@ -1,7 +1,7 @@
 use plexo_sdk::resources::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
 
 use crate::core::config::ADMIN_PHOTO_URL;
-
+use plexo_sdk::resources::members::member::MemberRole;
 use super::{
     app::Core,
     config::{ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD},
@@ -13,6 +13,7 @@ impl Core {
         let default_admin_password = (*ADMIN_PASSWORD).clone();
         let default_admin_name = (*ADMIN_NAME).clone();
         let default_admin_photo_url = (*ADMIN_PHOTO_URL).clone();
+        let default_admin_role = MemberRole::Admin;
 
         match self.engine.get_member_by_email(default_admin_email.clone()).await {
             Ok(Some(_admin)) => {
@@ -37,6 +38,7 @@ impl Core {
                     .name(default_admin_name)
                     .password_hash(hashed_password)
                     .photo_url(default_admin_photo_url)
+                    .role(default_admin_role)
                     .build()?,
             )
             .await?;
