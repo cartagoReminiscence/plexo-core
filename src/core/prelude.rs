@@ -1,11 +1,14 @@
-use plexo_sdk::resources::members::extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations};
+use plexo_sdk::resources::members::{
+    extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations},
+    operations::{GetMembersInput, MemberCrudOperations},
+};
 
-use crate::core::config::ADMIN_PHOTO_URL;
-use plexo_sdk::resources::members::member::MemberRole;
 use super::{
     app::Core,
     config::{ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD},
 };
+use crate::core::config::ADMIN_PHOTO_URL;
+use plexo_sdk::resources::members::member::MemberRole;
 
 impl Core {
     pub async fn prelude(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -25,6 +28,11 @@ impl Core {
                 return Err(Box::new(e));
             }
             _ => {}
+        }
+
+        if !self.engine.get_members(GetMembersInput::default()).await?.is_empty() {
+            println!("Members already exist, skipping default admin user creation");
+            return Ok(());
         }
 
         println!("Creating default admin user: {}", default_admin_email);
