@@ -4,7 +4,7 @@ version = "0.1.21"
 edition = "2021"
 
 [dependencies]
-plexo-sdk = "0.4.9"
+plexo-sdk = "0.4.10"
 uuid = "1.7.0"
 chrono = "0.4.34"
 jsonwebtoken = "9.2.0"

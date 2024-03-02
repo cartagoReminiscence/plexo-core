@@ -1,7 +1,6 @@
 pub mod assets;
 pub mod auth;
 pub mod changes;
-pub mod cognition;
 pub mod labels;
 pub mod members;
 pub mod profile;

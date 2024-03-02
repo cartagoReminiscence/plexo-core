@@ -36,7 +36,7 @@ impl AIProcessorGraphQLQuery {
             .map_err(|err| async_graphql::Error::new(err.to_string()))
     }
 
-    async fn suggest_new_project(&self, ctx: &Context<'_>, input: ProjectSuggestionInput) -> Result<ProjectSuggestion> {
+    async fn suggest_next_project(&self, ctx: &Context<'_>, input: ProjectSuggestionInput) -> Result<ProjectSuggestion> {
         let (core, _member_id) = extract_context(ctx)?;
 
         core.engine
