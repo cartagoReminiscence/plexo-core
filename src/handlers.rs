@@ -32,7 +32,7 @@ pub async fn graphiq_handler() -> impl IntoResponse {
 }
 
 #[handler]
-pub async fn index_handler(
+pub async fn graphql_handler(
     schema: PoemData<&Schema<QueryRoot, MutationRoot, SubscriptionRoot>>,
     headers: &HeaderMap,
     req: GraphQLRequest,

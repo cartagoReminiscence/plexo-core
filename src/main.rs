@@ -8,7 +8,7 @@ use plexo_core::{
         app::new_core_from_env,
         config::{DOMAIN, URL},
     },
-    handlers::{graphiq_handler, index_handler, version_handler, ws_switch_handler},
+    handlers::{graphiq_handler, graphql_handler, version_handler, ws_switch_handler},
 };
 use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Route, Server};
 use poem_openapi::OpenApiService;
@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .at("/version", get(version_handler))
         //
         .at("/playground", get(graphiq_handler))
-        .at("/graphql", post(index_handler))
+        .at("/graphql", post(graphql_handler))
         .at("/graphql/ws", get(ws_switch_handler));
 
     let app = app

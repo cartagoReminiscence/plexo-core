@@ -1,5 +1,9 @@
-use async_graphql::{MergedObject, MergedSubscription, Schema};
-// use plexo_sdk::backend::engine::Engine;
+use async_graphql::{
+    extensions::{Analyzer, Tracing}, // extensions::OpenTelemetry,
+    MergedObject,
+    MergedSubscription,
+    Schema,
+};
 
 use crate::core::app::Core;
 
@@ -55,20 +59,9 @@ impl GraphQLSchema for Core {
     fn graphql_api_schema(&self) -> Schema<QueryRoot, MutationRoot, SubscriptionRoot> {
         Schema::build(QueryRoot::default(), MutationRoot::default(), SubscriptionRoot::default())
             .data(self.clone()) // TODO: Optimize this
-            // .data(DataLoader::new(TaskLoader::new(self.clone()), tokio::spawn))
-            // .data(DataLoader::new(
-            //     ProjectLoader::new(self.clone()),
-            //     tokio::spawn,
-            // ))
-            // .data(DataLoader::new(
-            //     LabelLoader::new(self.clone()),
-            //     tokio::spawn,
-            // ))
-            // .data(DataLoader::new(
-            //     MemberLoader::new(self.clone()),
-            //     tokio::spawn,
-            // ))
-            // .data(DataLoader::new(TeamLoader::new(self.clone()), tokio::spawn))
+            .extension(Tracing)
+            .extension(Analyzer)
+            // .extension(open_telemetry)
             .finish()
     }
 }

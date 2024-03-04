@@ -32,5 +32,7 @@ lazy_static! {
     pub static ref JWT_ACCESS_TOKEN_SECRET: String = var("JWT_ACCESS_TOKEN_SECRET").unwrap_or("secret".into());
     pub static ref JWT_REFRESH_TOKEN_SECRET: String = var("JWT_REFRESH_TOKEN_SECRET").unwrap_or("secret".into());
     //
-    pub static ref STATIC_PAGE_ENABLED: bool = var("STATIC_PAGE_ENABLED").unwrap_or("false".into()).to_lowercase() == "true";
+    // pub static ref STATIC_PAGE_ENABLED: bool = var("STATIC_PAGE_ENABLED").unwrap_or("false".into()).to_lowercase() == "true";
+    //
+    pub static ref TRACING_LEVEL: String = var("TRACING_LEVEL").unwrap_or("info".into());
 }
