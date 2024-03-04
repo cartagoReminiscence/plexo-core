@@ -8,7 +8,7 @@ use plexo_core::{
         app::new_core_from_env,
         config::{DOMAIN, URL},
     },
-    handlers::{graphiq_handler, index_handler, ws_switch_handler},
+    handlers::{graphiq_handler, index_handler, version_handler, ws_switch_handler},
 };
 use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Route, Server};
 use poem_openapi::OpenApiService;
@@ -32,11 +32,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let spec_json_handler = api_service.spec_endpoint();
     let spec_yaml_handler = api_service.spec_endpoint_yaml();
 
-    let ui = api_service.swagger_ui();
+    let swagger_ui = api_service.swagger_ui();
 
     let app = Route::new()
         .nest(api_prefix, api_service)
-        .nest("/", ui)
+        .nest("/swagger", swagger_ui)
         .at("/openapi.json", get(spec_json_handler))
         .at("/openapi.yaml", get(spec_yaml_handler))
         // .nest("/", static_page)
@@ -48,6 +48,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .at("/auth/github/callback", get(github_callback_handler))
         //
         .at("/auth/logout", get(logout_handler))
+        //
+        .at("/version", get(version_handler))
         //
         .at("/playground", get(graphiq_handler))
         .at("/graphql", post(index_handler))

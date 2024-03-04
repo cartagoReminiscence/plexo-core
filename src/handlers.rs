@@ -20,6 +20,7 @@ use crate::{
     core::config::DOMAIN,
 };
 
+const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 #[handler]
 pub async fn graphiq_handler() -> impl IntoResponse {
     Html(
@@ -79,4 +80,9 @@ pub async fn on_connection_init(value: Value) -> async_graphql::Result<Data> {
         }
         _ => Err("Authorization token is required".into()),
     }
+}
+
+#[handler]
+pub async fn version_handler() -> impl IntoResponse {
+    VERSION.unwrap_or("No version found")
 }
