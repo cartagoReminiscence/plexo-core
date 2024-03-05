@@ -32,6 +32,7 @@ lazy_static! {
     pub static ref ORGANIZATION_PHOTO_URL: String = var("ORGANIZATION_PHOTO_URL").unwrap_or("https://unavatar.io/plexo.app".into());
     pub static ref ORGANIZATION_HUB_ID: Option<String> = var("ORGANIZATION_HUB_ID").ok();
     pub static ref ORGANIZATION_PLAN_ID: Option<String> = var("ORGANIZATION_PLAN_ID").ok();
+    pub static ref ORGANIZATION_URL: String = var("ORGANIZATION_URL").unwrap_or(format!("https://{}.plexo.app", *ORGANIZATION_NAME));
     //
     pub static ref JWT_ACCESS_TOKEN_SECRET: String = var("JWT_ACCESS_TOKEN_SECRET").unwrap_or("secret".into());
     pub static ref JWT_REFRESH_TOKEN_SECRET: String = var("JWT_REFRESH_TOKEN_SECRET").unwrap_or("secret".into());

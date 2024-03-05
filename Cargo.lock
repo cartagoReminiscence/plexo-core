@@ -2185,6 +2185,7 @@ name = "plexo-core"
 version = "0.2.2"
 dependencies = [
  "argon2",
+ "askama",
  "async-graphql",
  "async-graphql-poem",
  "chrono",

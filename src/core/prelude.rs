@@ -2,9 +2,12 @@ use super::{
     app::Core,
     config::{
         ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_PHOTO_URL, ORGANIZATION_EMAIL, ORGANIZATION_HUB_ID, ORGANIZATION_NAME,
-        ORGANIZATION_PHOTO_URL, ORGANIZATION_PLAN_ID,
+        ORGANIZATION_PHOTO_URL, ORGANIZATION_PLAN_ID, ORGANIZATION_URL,
     },
+    email::FirstWelcomeTemplate,
 };
+
+use askama::Template;
 
 use plexo_sdk::{
     common::commons::SortOrder,
@@ -114,8 +117,18 @@ impl Core {
         let from = "onboarding@plexo.app";
         let to = organization_owner_email.as_str();
         let subject = "Welcome to Plexo!";
-        let html = "<h1>Welcome to Plexo!</h1>";
+        // let html = "<h1>Welcome to Plexo!</h1>";
 
-        self.send_email(from, to, subject, html).map_err(|err| err.into())
+        let welcome = FirstWelcomeTemplate {
+            admin_email: (*ADMIN_EMAIL).to_owned(),
+            admin_password: (*ADMIN_PASSWORD).to_owned(),
+            plexo_url: (*ORGANIZATION_URL).to_owned(),
+            // organization_name: (*ORGANIZATION_NAME).to_owned(),
+            // organization_email: (*ORGANIZATION_EMAIL).to_owned(),
+        };
+
+        let html = welcome.render().unwrap();
+
+        self.send_email(from, to, subject, html.as_str()).map_err(|err| err.into())
     }
 }
