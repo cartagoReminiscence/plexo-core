@@ -28,6 +28,8 @@ lazy_static! {
     pub static ref ADMIN_PHOTO_URL: String = var("ADMIN_PHOTO_URL").unwrap_or("https://unavatar.io/plexo.app".into());
     //
     pub static ref ORGANIZATION_NAME: String = var("ORGANIZATION_NAME").unwrap_or("Plexo".into());
+    pub static ref ORGANIZATION_EMAIL: String = var("ORGANIZATION_EMAIL").unwrap_or("admin@plexo.app".into());
+    pub static ref ORGANIZATION_PHOTO_URL: String = var("ORGANIZATION_PHOTO_URL").unwrap_or("https://unavatar.io/plexo.app".into());
     //
     pub static ref JWT_ACCESS_TOKEN_SECRET: String = var("JWT_ACCESS_TOKEN_SECRET").unwrap_or("secret".into());
     pub static ref JWT_REFRESH_TOKEN_SECRET: String = var("JWT_REFRESH_TOKEN_SECRET").unwrap_or("secret".into());
@@ -35,4 +37,6 @@ lazy_static! {
     // pub static ref STATIC_PAGE_ENABLED: bool = var("STATIC_PAGE_ENABLED").unwrap_or("false".into()).to_lowercase() == "true";
     //
     pub static ref TRACING_LEVEL: String = var("TRACING_LEVEL").unwrap_or("info".into());
+    //
+    pub static ref RESEND_API_KEY: Option<String> = var("RESEND_API_KEY").ok();
 }

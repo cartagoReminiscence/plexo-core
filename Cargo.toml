@@ -4,7 +4,7 @@ version = "0.1.24"
 edition = "2021"
 
 [dependencies]
-plexo-sdk = "0.4.12"
+plexo-sdk = "0.4.13"
 uuid = "1.7.0"
 chrono = "0.4.34"
 jsonwebtoken = "9.2.0"
@@ -28,11 +28,12 @@ async-graphql = { version = "7.0.2", features = [
     "tracing",
 ] }
 reqwest = { version = "0.11.24", features = ["json"] }
-poem-openapi = { version = "4.0.0", features = [
+poem-openapi = { version = "4.0.1", features = [
     "swagger-ui",
     "chrono",
     "uuid",
 ] }
-poem = { version = "2.0.0", features = ["cookie", "static-files"] }
+poem = { version = "2.0.1", features = ["cookie", "static-files"] }
 tracing-subscriber = "0.3.18"
 tracing = "0.1.40"
+resend-rs = "0.3.0"

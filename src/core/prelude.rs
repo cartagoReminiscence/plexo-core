@@ -1,20 +1,28 @@
-use plexo_sdk::resources::members::{
-    extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations},
-    operations::{GetMembersInput, MemberCrudOperations},
-};
-
 use super::{
     app::Core,
-    config::{ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD},
+    config::{
+        ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_PHOTO_URL, ORGANIZATION_EMAIL, ORGANIZATION_NAME, ORGANIZATION_PHOTO_URL,
+    },
 };
-use crate::core::config::ADMIN_PHOTO_URL;
-use plexo_sdk::resources::members::member::MemberRole;
+
+use plexo_sdk::{
+    common::commons::SortOrder,
+    organization::operations::{Organization, OrganizationCrudOperations, OrganizationInitializationInputBuilder},
+    resources::members::{
+        extensions::{CreateMemberFromEmailInputBuilder, MembersExtensionOperations},
+        member::MemberRole,
+        operations::{GetMembersInput, GetMembersInputBuilder, MemberCrudOperations},
+    },
+};
 
 impl Core {
-    pub async fn prelude(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn prelude(&self) -> Result<Organization, Box<dyn std::error::Error>> {
         self.normalize_admin_user().await?;
 
-        Ok(())
+        match self.engine.get_organization().await? {
+            Some(organization) => Ok(organization),
+            None => self.initialize_organization().await,
+        }
     }
 
     async fn normalize_admin_user(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -57,5 +65,49 @@ impl Core {
             )
             .await?;
         Ok(())
+    }
+
+    async fn initialize_organization(&self) -> Result<Organization, Box<dyn std::error::Error>> {
+        let members = self
+            .engine
+            .get_members(
+                GetMembersInputBuilder::default()
+                    .limit(1)
+                    .sort_by("created_at".to_string())
+                    .sort_order(SortOrder::Asc)
+                    .build()?,
+            )
+            .await?;
+
+        let first_member = members.first().unwrap();
+
+        let org = self
+            .engine
+            .initialize_organization(
+                first_member.id,
+                OrganizationInitializationInputBuilder::default()
+                    .name((*ORGANIZATION_NAME).to_owned())
+                    .email((*ORGANIZATION_EMAIL).to_owned())
+                    .photo_url((*ORGANIZATION_PHOTO_URL).to_owned())
+                    .owner_id(first_member.id)
+                    .build()?,
+            )
+            .await
+            .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
+
+        let org_email = org.email.clone();
+
+        self.first_time_welcome_email(org_email)?;
+
+        Ok(org)
+    }
+
+    fn first_time_welcome_email(&self, organization_owner_email: String) -> Result<(), Box<dyn std::error::Error>> {
+        let from = "onboarding@plexo.app";
+        let to = &[organization_owner_email.as_str()];
+        let subject = "Welcome to Plexo!";
+        let html = "<h1>Welcome to Plexo!</h1>";
+
+        self.send_email(from, to, subject, html).map_err(|err| err.into())
     }
 }

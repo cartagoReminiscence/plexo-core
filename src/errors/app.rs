@@ -26,6 +26,9 @@ pub enum PlexoAppError {
 
     #[error("JSONWebToken error")]
     JSONWebTokenError(#[from] jsonwebtoken::errors::Error),
+
+    #[error("Resend error")]
+    ResendError(#[from] resend_rs::error::Error),
 }
 
 impl ResponseError for PlexoAppError {
@@ -40,6 +43,7 @@ impl ResponseError for PlexoAppError {
             PlexoAppError::SDKError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             PlexoAppError::NotFoundPoemError(_) => StatusCode::NOT_FOUND,
             PlexoAppError::JSONWebTokenError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            PlexoAppError::ResendError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
