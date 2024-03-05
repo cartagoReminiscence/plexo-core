@@ -30,6 +30,8 @@ lazy_static! {
     pub static ref ORGANIZATION_NAME: String = var("ORGANIZATION_NAME").unwrap_or("Plexo".into());
     pub static ref ORGANIZATION_EMAIL: String = var("ORGANIZATION_EMAIL").unwrap_or("admin@plexo.app".into());
     pub static ref ORGANIZATION_PHOTO_URL: String = var("ORGANIZATION_PHOTO_URL").unwrap_or("https://unavatar.io/plexo.app".into());
+    pub static ref ORGANIZATION_HUB_ID: Option<String> = var("ORGANIZATION_HUB_ID").ok();
+    pub static ref ORGANIZATION_PLAN_ID: Option<String> = var("ORGANIZATION_PLAN_ID").ok();
     //
     pub static ref JWT_ACCESS_TOKEN_SECRET: String = var("JWT_ACCESS_TOKEN_SECRET").unwrap_or("secret".into());
     pub static ref JWT_REFRESH_TOKEN_SECRET: String = var("JWT_REFRESH_TOKEN_SECRET").unwrap_or("secret".into());
@@ -38,5 +40,8 @@ lazy_static! {
     //
     pub static ref TRACING_LEVEL: String = var("TRACING_LEVEL").unwrap_or("info".into());
     //
-    pub static ref RESEND_API_KEY: Option<String> = var("RESEND_API_KEY").ok();
+    pub static ref SMTP_HOST: Option<String> = var("SMTP_HOST").ok();
+    pub static ref SMTP_PORT: String = var("SMTP_PORT").unwrap_or("25".into());
+    pub static ref SMTP_USERNAME: Option<String> = var("SMTP_USERNAME").ok();
+    pub static ref SMTP_PASSWORD: Option<String> = var("SMTP_PASSWORD").ok();
 }

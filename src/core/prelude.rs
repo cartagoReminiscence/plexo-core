@@ -1,7 +1,8 @@
 use super::{
     app::Core,
     config::{
-        ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_PHOTO_URL, ORGANIZATION_EMAIL, ORGANIZATION_NAME, ORGANIZATION_PHOTO_URL,
+        ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_PHOTO_URL, ORGANIZATION_EMAIL, ORGANIZATION_HUB_ID, ORGANIZATION_NAME,
+        ORGANIZATION_PHOTO_URL, ORGANIZATION_PLAN_ID,
     },
 };
 
@@ -14,6 +15,7 @@ use plexo_sdk::{
         operations::{GetMembersInput, GetMembersInputBuilder, MemberCrudOperations},
     },
 };
+use tracing::info;
 
 impl Core {
     pub async fn prelude(&self) -> Result<Organization, Box<dyn std::error::Error>> {
@@ -36,22 +38,22 @@ impl Core {
 
         match self.engine.get_member_by_email(default_admin_email.clone()).await {
             Ok(Some(_admin)) => {
-                println!("Default admin user already exists: {}", default_admin_email);
+                info!("default admin user already exists: {}", default_admin_email);
                 return Ok(());
             }
             Err(e) => {
-                println!("Error checking for default admin user: {}", e);
+                info!("error checking for default admin user: {}", e);
                 return Err(Box::new(e));
             }
             _ => {}
         }
 
         if !self.engine.get_members(GetMembersInput::default()).await?.is_empty() {
-            println!("Members already exist, skipping default admin user creation");
+            info!("members already exist, skipping default admin user creation");
             return Ok(());
         }
 
-        println!("Creating default admin user: {}", default_admin_email);
+        info!("creating default admin user: {}", default_admin_email);
 
         self.engine
             .create_member_from_email(
@@ -81,17 +83,23 @@ impl Core {
 
         let first_member = members.first().unwrap();
 
+        let mut org_data = OrganizationInitializationInputBuilder::default()
+            .name((*ORGANIZATION_NAME).to_owned())
+            .email((*ORGANIZATION_EMAIL).to_owned())
+            .photo_url((*ORGANIZATION_PHOTO_URL).to_owned())
+            .owner_id(first_member.id);
+
+        if let Some(org_hub_id) = (*ORGANIZATION_HUB_ID).to_owned() {
+            org_data = org_data.hub_id(org_hub_id);
+        }
+
+        if let Some(org_plan_id) = (*ORGANIZATION_PLAN_ID).to_owned() {
+            org_data = org_data.plan_id(org_plan_id);
+        }
+
         let org = self
             .engine
-            .initialize_organization(
-                first_member.id,
-                OrganizationInitializationInputBuilder::default()
-                    .name((*ORGANIZATION_NAME).to_owned())
-                    .email((*ORGANIZATION_EMAIL).to_owned())
-                    .photo_url((*ORGANIZATION_PHOTO_URL).to_owned())
-                    .owner_id(first_member.id)
-                    .build()?,
-            )
+            .initialize_organization(first_member.id, org_data.build()?)
             .await
             .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
 
@@ -104,7 +112,7 @@ impl Core {
 
     fn first_time_welcome_email(&self, organization_owner_email: String) -> Result<(), Box<dyn std::error::Error>> {
         let from = "onboarding@plexo.app";
-        let to = &[organization_owner_email.as_str()];
+        let to = organization_owner_email.as_str();
         let subject = "Welcome to Plexo!";
         let html = "<h1>Welcome to Plexo!</h1>";
 

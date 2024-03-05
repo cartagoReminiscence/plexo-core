@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, str::FromStr};
 
 use dotenv::dotenv;
 use plexo_core::{
@@ -6,20 +6,30 @@ use plexo_core::{
     auth::handlers::{email_basic_login_handler, github_callback_handler, github_sign_in_handler, logout_handler},
     core::{
         app::new_core_from_env,
-        config::{DOMAIN, URL},
+        config::{DOMAIN, TRACING_LEVEL, URL},
     },
     handlers::{graphiq_handler, graphql_handler, version_handler, ws_switch_handler},
 };
 use poem::{get, listener::TcpListener, middleware::Cors, post, EndpointExt, Route, Server};
 use poem_openapi::OpenApiService;
+use tracing::{info, subscriber::set_global_default, Level};
+use tracing_subscriber::FmtSubscriber;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
+    set_global_default(
+        FmtSubscriber::builder()
+            .with_max_level(Level::from_str((*TRACING_LEVEL).to_uppercase().as_str()).unwrap_or(Level::INFO))
+            .finish(),
+    )
+    .expect("setting default subscriber failed");
 
     let core = new_core_from_env().await?;
 
-    core.prelude().await?;
+    let org = core.prelude().await?;
+
+    info!("welcome to {:?}", org.name);
 
     let graphql_schema = core.graphql_api_schema();
 
@@ -60,7 +70,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .data(graphql_schema)
         .data(core.clone());
 
-    println!("Visit GraphQL Playground at {}/playground", *DOMAIN);
+    info!("visit GraphQL Playground at {}/playground", *DOMAIN);
 
     Server::new(TcpListener::bind(URL.to_owned()))
         .run(app)
