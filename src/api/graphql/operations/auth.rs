@@ -42,7 +42,7 @@ impl AuthMutation {
     async fn register(&self, ctx: &Context<'_>, email: String, name: String, password: String) -> Result<LoginResponse> {
         let (plexo_engine, _member_id) = extract_context(ctx)?;
 
-        if (plexo_engine.engine.get_member_by_email(email.clone()).await).is_ok() {
+        if (plexo_engine.engine.get_member_by_email(email.clone()).await).is_ok_and(|member| member.is_some()) {
             return Err(PlexoAppError::EmailAlreadyExists.into());
         };
 
