@@ -1,11 +1,11 @@
-use crate::api::graphql::{commons::extract_context, resources::tasks::Task};
+use crate::api::graphql::{
+    commons::{create_change, extract_context},
+    resources::tasks::Task,
+};
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::resources::{
-    changes::{
-        change::{ChangeOperation, ChangeResourceType},
-        operations::{ChangeCrudOperations, CreateChangeInputBuilder},
-    },
+    changes::change::{ChangeOperation, ChangeResourceType},
     tasks::{
         extensions::{CreateTasksInput, TasksExtensionOperations},
         operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
@@ -60,29 +60,22 @@ impl TasksGraphQLMutation {
         let saved_task = task.clone();
 
         let input = saved_input.clone();
-        // let task = task.clone();
-        let engine = core.engine.clone();
 
         task::spawn(async move {
-            let change = engine
-                .create_change(
-                    CreateChangeInputBuilder::default()
-                        .owner_id(member_id)
-                        .resource_id(task.id)
-                        .operation(ChangeOperation::Create)
-                        .resource_type(ChangeResourceType::Task)
-                        .diff_json(
-                            serde_json::to_string(&json!({
-                                "input": input,
-                                "result": task,
-                            }))
-                            .unwrap(),
-                        )
-                        .build()
-                        .unwrap(),
-                )
-                .await
-                .unwrap();
+            let change = create_change(
+                &core,
+                member_id,
+                task.id,
+                ChangeOperation::Create,
+                ChangeResourceType::Task,
+                serde_json::to_string(&json!({
+                    "input": input,
+                    "result": task,
+                }))
+                .unwrap(),
+            )
+            .await
+            .unwrap();
 
             println!("change registered: {} | {}", change.operation, change.resource_type);
         });
@@ -105,30 +98,25 @@ impl TasksGraphQLMutation {
         // .map(|tasks| tasks.into_iter().map(|task| task.into()).collect())
 
         tasks.iter().for_each(|task| {
-            let engine = core.engine.clone();
+            let core = core.clone();
             let input = saved_input.clone();
             let task = task.clone();
 
             task::spawn(async move {
-                let change = engine
-                    .create_change(
-                        CreateChangeInputBuilder::default()
-                            .owner_id(member_id)
-                            .resource_id(task.id)
-                            .operation(ChangeOperation::Create)
-                            .resource_type(ChangeResourceType::Task)
-                            .diff_json(
-                                serde_json::to_string(&json!({
-                                    "input": input,
-                                    "result": task,
-                                }))
-                                .unwrap(),
-                            )
-                            .build()
-                            .unwrap(),
-                    )
-                    .await
-                    .unwrap();
+                let change = create_change(
+                    &core,
+                    member_id,
+                    task.id,
+                    ChangeOperation::Create,
+                    ChangeResourceType::Task,
+                    serde_json::to_string(&json!({
+                        "input": input,
+                        "result": task,
+                    }))
+                    .unwrap(),
+                )
+                .await
+                .unwrap();
 
                 println!("change registered: {} | {}", change.operation, change.resource_type);
             });
@@ -146,31 +134,22 @@ impl TasksGraphQLMutation {
 
         let task = task.clone();
         let saved_task = task.clone();
-        let engine = core.engine.clone();
-
-        // .map_err(|err| async_graphql::Error::new(err.to_string()))
-        // .map(|task| task.into())
 
         tokio::spawn(async move {
-            let change = engine
-                .create_change(
-                    CreateChangeInputBuilder::default()
-                        .owner_id(member_id)
-                        .resource_id(task.id)
-                        .operation(ChangeOperation::Update)
-                        .resource_type(ChangeResourceType::Task)
-                        .diff_json(
-                            serde_json::to_string(&json!({
-                                "input": saved_input,
-                                "result": task,
-                            }))
-                            .unwrap(),
-                        )
-                        .build()
-                        .unwrap(),
-                )
-                .await
-                .unwrap();
+            let change = create_change(
+                &core,
+                member_id,
+                task.id,
+                ChangeOperation::Update,
+                ChangeResourceType::Task,
+                serde_json::to_string(&json!({
+                    "input": saved_input,
+                    "result": task,
+                }))
+                .unwrap(),
+            )
+            .await
+            .unwrap();
 
             println!("change registered: {} | {}", change.operation, change.resource_type);
         });
@@ -184,30 +163,20 @@ impl TasksGraphQLMutation {
         let task = core.engine.delete_task(id).await?;
         let saved_task = task.clone();
 
-        // .map_err(|err| async_graphql::Error::new(err.to_string()))
-        // .map(|task| task.into())
-
-        let engine = core.engine.clone();
-
         tokio::spawn(async move {
-            let change = engine
-                .create_change(
-                    CreateChangeInputBuilder::default()
-                        .owner_id(task.owner_id)
-                        .resource_id(task.id)
-                        .operation(ChangeOperation::Delete)
-                        .resource_type(ChangeResourceType::Task)
-                        .diff_json(
-                            serde_json::to_string(&json!({
-                                "result": task,
-                            }))
-                            .unwrap(),
-                        )
-                        .build()
-                        .unwrap(),
-                )
-                .await
-                .unwrap();
+            let change = create_change(
+                &core,
+                task.owner_id,
+                task.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Task,
+                serde_json::to_string(&json!({
+                    "result": task,
+                }))
+                .unwrap(),
+            )
+            .await
+            .unwrap();
 
             println!("change registered: {} | {}", change.operation, change.resource_type);
         });
