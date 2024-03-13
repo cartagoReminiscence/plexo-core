@@ -2172,7 +2172,7 @@ checksum = "2900ede94e305130c13ddd391e0ab7cbaeb783945ae07a279c268cb05109c6cb"
 
 [[package]]
 name = "plexo-core"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "argon2",
  "askama",
@@ -2201,9 +2201,9 @@ dependencies = [
 
 [[package]]
 name = "plexo-sdk"
-version = "0.4.17"
+version = "0.4.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a2c6665a26008350f0c1e64c00245270f9f4f86cafccff91e8fe02ca830d4ee"
+checksum = "91b285e4318ef285cf164a170a0e1149531cf8bc6e9db961ec9f32e1e64f2fdb"
 dependencies = [
  "askama",
  "async-graphql",
