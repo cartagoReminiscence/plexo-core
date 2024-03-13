@@ -62,7 +62,7 @@ impl TasksGraphQLMutation {
         let input = saved_input.clone();
 
         task::spawn(async move {
-            let change = create_change(
+            create_change(
                 &core,
                 member_id,
                 task.id,
@@ -76,8 +76,6 @@ impl TasksGraphQLMutation {
             )
             .await
             .unwrap();
-
-            println!("change registered: {} | {}", change.operation, change.resource_type);
         });
 
         Ok(saved_task.into())
@@ -94,16 +92,13 @@ impl TasksGraphQLMutation {
         let tasks = core.engine.create_tasks(input).await?;
         let saved_tasks = tasks.clone();
 
-        // .map_err(|err| async_graphql::Error::new(err.to_string()))
-        // .map(|tasks| tasks.into_iter().map(|task| task.into()).collect())
-
         tasks.iter().for_each(|task| {
             let core = core.clone();
             let input = saved_input.clone();
             let task = task.clone();
 
             task::spawn(async move {
-                let change = create_change(
+                create_change(
                     &core,
                     member_id,
                     task.id,
@@ -117,8 +112,6 @@ impl TasksGraphQLMutation {
                 )
                 .await
                 .unwrap();
-
-                println!("change registered: {} | {}", change.operation, change.resource_type);
             });
         });
 
@@ -136,7 +129,7 @@ impl TasksGraphQLMutation {
         let saved_task = task.clone();
 
         tokio::spawn(async move {
-            let change = create_change(
+            create_change(
                 &core,
                 member_id,
                 task.id,
@@ -150,8 +143,6 @@ impl TasksGraphQLMutation {
             )
             .await
             .unwrap();
-
-            println!("change registered: {} | {}", change.operation, change.resource_type);
         });
 
         Ok(saved_task.into())
@@ -164,7 +155,7 @@ impl TasksGraphQLMutation {
         let saved_task = task.clone();
 
         tokio::spawn(async move {
-            let change = create_change(
+            create_change(
                 &core,
                 task.owner_id,
                 task.id,
@@ -177,8 +168,6 @@ impl TasksGraphQLMutation {
             )
             .await
             .unwrap();
-
-            println!("change registered: {} | {}", change.operation, change.resource_type);
         });
 
         Ok(saved_task.into())

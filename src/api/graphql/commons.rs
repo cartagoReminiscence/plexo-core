@@ -3,6 +3,7 @@ use plexo_sdk::resources::changes::{
     change::{Change, ChangeOperation, ChangeResourceType},
     operations::{ChangeCrudOperations, CreateChangeInputBuilder},
 };
+use tracing::info;
 use uuid::Uuid;
 
 use crate::{auth::resources::PlexoAuthToken, core::app::Core, errors::app::PlexoAppError};
@@ -43,7 +44,7 @@ pub async fn create_change(
         )
         .await?;
 
-    println!("change registered: {} | {}", change.operation, change.resource_type);
+    info!("change registered: {:?}", change);
 
     Ok(change)
 }
