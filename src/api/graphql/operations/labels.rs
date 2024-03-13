@@ -1,8 +1,11 @@
 use crate::api::graphql::{commons::extract_context, resources::labels::Label};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput};
-use tokio_stream::Stream;
+use plexo_sdk::resources::{
+    changes::change::{ChangeResourceType, ListenEvent},
+    labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput},
+};
+use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
 #[derive(Default)]
@@ -73,7 +76,13 @@ pub struct LabelsGraphQLSubscription;
 
 #[Subscription]
 impl LabelsGraphQLSubscription {
-    async fn events_label(&self) -> impl Stream<Item = i32> {
-        futures_util::stream::iter(0..10)
+    async fn labels(&self, ctx: &Context<'_>) -> impl Stream<Item = ListenEvent> {
+        let (core, _member_id) = extract_context(ctx).unwrap();
+
+        core.engine
+            .listen(ChangeResourceType::Labels)
+            .await
+            .unwrap()
+            .map(|x| x.unwrap())
     }
 }

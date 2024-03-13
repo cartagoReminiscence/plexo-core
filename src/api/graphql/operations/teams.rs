@@ -1,8 +1,12 @@
 use crate::api::graphql::{commons::extract_context, resources::teams::Team};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput};
-use tokio_stream::Stream;
+use plexo_sdk::resources::{
+    changes::change::{ChangeResourceType, ListenEvent},
+    teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput},
+};
+
+use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
 #[derive(Default)]
@@ -76,7 +80,13 @@ pub struct TeamsGraphQLSubscription;
 
 #[Subscription]
 impl TeamsGraphQLSubscription {
-    async fn events_team(&self) -> impl Stream<Item = i32> {
-        futures_util::stream::iter(0..10)
+    async fn teams(&self, ctx: &Context<'_>) -> impl Stream<Item = ListenEvent> {
+        let (core, _member_id) = extract_context(ctx).unwrap();
+
+        core.engine
+            .listen(ChangeResourceType::Teams)
+            .await
+            .unwrap()
+            .map(|x| x.unwrap())
     }
 }

@@ -4,7 +4,6 @@ use crate::api::graphql::{
 };
 use async_graphql::{Context, Object, Result, Subscription};
 
-use futures_util::StreamExt;
 use plexo_sdk::resources::{
     changes::change::{ChangeOperation, ChangeResourceType, ListenEvent},
     tasks::{
@@ -14,7 +13,7 @@ use plexo_sdk::resources::{
 };
 use serde_json::json;
 use tokio::task;
-use tokio_stream::Stream;
+use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
 #[derive(Default)]

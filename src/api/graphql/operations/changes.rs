@@ -1,8 +1,8 @@
 use crate::api::graphql::{commons::extract_context, resources::changes::Change};
-use async_graphql::{Context, Object, Result, Subscription};
+use async_graphql::{Context, Object, Result};
 
 use plexo_sdk::resources::changes::operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput};
-use tokio_stream::Stream;
+// use tokio_stream::Stream;
 use uuid::Uuid;
 
 #[derive(Default)]
@@ -74,9 +74,9 @@ impl ChangesGraphQLMutation {
 #[derive(Default)]
 pub struct ChangesGraphQLSubscription;
 
-#[Subscription]
-impl ChangesGraphQLSubscription {
-    async fn events_change(&self) -> impl Stream<Item = i32> {
-        futures_util::stream::iter(0..10)
-    }
-}
+// #[Subscription]
+// impl ChangesGraphQLSubscription {
+//     async fn events_change(&self) -> impl Stream<Item = i32> {
+//         todo!()
+//     }
+// }

@@ -2181,7 +2181,6 @@ dependencies = [
  "chrono",
  "cookie",
  "dotenv",
- "futures-util",
  "jsonwebtoken",
  "lazy_static",
  "lettre",
