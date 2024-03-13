@@ -66,8 +66,8 @@ impl TasksGraphQLMutation {
                 &core,
                 member_id,
                 task.id,
-                ChangeOperation::Create,
-                ChangeResourceType::Task,
+                ChangeOperation::Insert,
+                ChangeResourceType::Tasks,
                 serde_json::to_string(&json!({
                     "input": input,
                     "result": task,
@@ -102,8 +102,8 @@ impl TasksGraphQLMutation {
                     &core,
                     member_id,
                     task.id,
-                    ChangeOperation::Create,
-                    ChangeResourceType::Task,
+                    ChangeOperation::Insert,
+                    ChangeResourceType::Tasks,
                     serde_json::to_string(&json!({
                         "input": input,
                         "result": task,
@@ -134,7 +134,7 @@ impl TasksGraphQLMutation {
                 member_id,
                 task.id,
                 ChangeOperation::Update,
-                ChangeResourceType::Task,
+                ChangeResourceType::Tasks,
                 serde_json::to_string(&json!({
                     "input": saved_input,
                     "result": task,
@@ -160,7 +160,7 @@ impl TasksGraphQLMutation {
                 task.owner_id,
                 task.id,
                 ChangeOperation::Delete,
-                ChangeResourceType::Task,
+                ChangeResourceType::Tasks,
                 serde_json::to_string(&json!({
                     "result": task,
                 }))
