@@ -16,7 +16,10 @@ use poem::{
 
 use crate::{
     api::graphql::schema::{MutationRoot, QueryRoot, SubscriptionRoot},
-    auth::commons::{get_token_from_cookie, get_token_from_headers},
+    auth::{
+        commons::{get_token_from_cookie, get_token_from_headers},
+        resources::PlexoAuthToken,
+    },
     core::config::DOMAIN,
 };
 
@@ -72,7 +75,8 @@ pub async fn on_connection_init(value: Value) -> async_graphql::Result<Data> {
         Value::Object(map) => {
             if let Some(Value::String(token)) = map.get("Authorization") {
                 let mut data = Data::default();
-                data.insert(token.to_string());
+                data.insert(PlexoAuthToken(token.to_string()));
+
                 Ok(data)
             } else {
                 Err("Authorization token is required".into())

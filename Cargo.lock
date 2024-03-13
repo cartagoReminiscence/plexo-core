@@ -2202,9 +2202,9 @@ dependencies = [
 
 [[package]]
 name = "plexo-sdk"
-version = "0.4.16"
+version = "0.4.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8784c1935167aa3a459cba6343fa45f30ff11b399cb625fc73617391e1c55f9"
+checksum = "2a2c6665a26008350f0c1e64c00245270f9f4f86cafccff91e8fe02ca830d4ee"
 dependencies = [
  "askama",
  "async-graphql",

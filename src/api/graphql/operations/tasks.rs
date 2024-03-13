@@ -4,8 +4,9 @@ use crate::api::graphql::{
 };
 use async_graphql::{Context, Object, Result, Subscription};
 
+use futures_util::StreamExt;
 use plexo_sdk::resources::{
-    changes::change::{ChangeOperation, ChangeResourceType},
+    changes::change::{ChangeOperation, ChangeResourceType, ListenEvent},
     tasks::{
         extensions::{CreateTasksInput, TasksExtensionOperations},
         operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
@@ -179,7 +180,13 @@ pub struct TasksGraphQLSubscription;
 
 #[Subscription]
 impl TasksGraphQLSubscription {
-    async fn events1(&self) -> impl Stream<Item = i32> {
-        futures_util::stream::iter(0..10)
+    async fn tasks(&self, ctx: &Context<'_>) -> impl Stream<Item = ListenEvent> {
+        let (core, _member_id) = extract_context(ctx).unwrap();
+
+        core.engine
+            .listen(ChangeResourceType::Tasks)
+            .await
+            .unwrap()
+            .map(|x| x.unwrap())
     }
 }
