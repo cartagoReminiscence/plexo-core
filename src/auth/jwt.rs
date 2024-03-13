@@ -41,7 +41,7 @@ impl JWTEngine {
             iss: "Plexo".to_string(),
             aud: "session.plexo.app".to_string(),
             sub: member.id.to_string(),
-            exp: (Utc::now() + chrono::Duration::days(7)).timestamp() as usize,
+            exp: (Utc::now() + chrono::Duration::try_days(7).unwrap()).timestamp() as usize,
         };
 
         let token = encode(

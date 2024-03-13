@@ -112,7 +112,7 @@ pub async fn github_callback_handler(plexo_core: Data<&Core>, params: Query<Gith
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
     session_token_cookie.set_same_site(SameSite::Lax);
-    session_token_cookie.set_expires(Utc::now() + Duration::days(7));
+    session_token_cookie.set_expires(Utc::now() + Duration::try_days(7).unwrap());
     session_token_cookie.set_path("/");
 
     Response::builder()
@@ -188,7 +188,7 @@ pub async fn email_basic_login_handler(plexo_engine: Data<&Core>, params: Json<E
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(cookie_secure);
     session_token_cookie.set_same_site(cookie_same_site);
-    session_token_cookie.set_expires(Utc::now() + Duration::days(7));
+    session_token_cookie.set_expires(Utc::now() + Duration::try_days(7).unwrap());
     session_token_cookie.set_path("/");
     session_token_cookie.set_domain(cookie_domain);
 
@@ -255,7 +255,7 @@ pub async fn email_basic_register_handler(
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
     session_token_cookie.set_same_site(SameSite::Lax);
-    session_token_cookie.set_expires(Utc::now() + Duration::days(7));
+    session_token_cookie.set_expires(Utc::now() + Duration::try_days(7).unwrap());
     session_token_cookie.set_path("/");
 
     Ok(Response::builder()
@@ -276,7 +276,7 @@ pub async fn logout_handler() -> Result<Response> {
     session_token_cookie.set_http_only(true);
     session_token_cookie.set_secure(true);
     session_token_cookie.set_same_site(SameSite::Strict);
-    session_token_cookie.set_expires(Utc::now() - Duration::days(1));
+    session_token_cookie.set_expires(Utc::now() - Duration::try_days(1).unwrap());
     session_token_cookie.set_domain(cookie_domain);
     session_token_cookie.set_path("/");
 
