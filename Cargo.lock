@@ -2172,7 +2172,7 @@ checksum = "2900ede94e305130c13ddd391e0ab7cbaeb783945ae07a279c268cb05109c6cb"
 
 [[package]]
 name = "plexo-core"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "argon2",
  "askama",
