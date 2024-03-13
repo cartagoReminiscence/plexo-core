@@ -9,15 +9,15 @@ use crate::core::app::Core;
 
 use super::{
     operations::{
-        assets::{AssetsGraphQLMutation, AssetsGraphQLQuery},
+        assets::{AssetsGraphQLMutation, AssetsGraphQLQuery, AssetsGraphQLSubscription},
         auth::AuthMutation,
         changes::ChangesGraphQLQuery,
-        labels::{LabelsGraphQLMutation, LabelsGraphQLQuery},
-        members::{MembersGraphQLMutation, MembersGraphQLQuery},
+        labels::{LabelsGraphQLMutation, LabelsGraphQLQuery, LabelsGraphQLSubscription},
+        members::{MembersGraphQLMutation, MembersGraphQLQuery, MembersGraphQLSubscription},
         profile::{ProfileGraphQLMutation, ProfileGraphQLQuery},
-        projects::{ProjectsGraphQLMutation, ProjectsGraphQLQuery},
+        projects::{ProjectsGraphQLMutation, ProjectsGraphQLQuery, ProjectsGraphQLSubscription},
         tasks::{TasksGraphQLMutation, TasksGraphQLQuery, TasksGraphQLSubscription},
-        teams::{TeamsGraphQLMutation, TeamsGraphQLQuery},
+        teams::{TeamsGraphQLMutation, TeamsGraphQLQuery, TeamsGraphQLSubscription},
     },
     processors::ai::AIProcessorGraphQLQuery,
 };
@@ -49,7 +49,14 @@ pub struct MutationRoot(
 );
 
 #[derive(MergedSubscription, Default)]
-pub struct SubscriptionRoot(TasksGraphQLSubscription);
+pub struct SubscriptionRoot(
+    TasksGraphQLSubscription,
+    ProjectsGraphQLSubscription,
+    AssetsGraphQLSubscription,
+    LabelsGraphQLSubscription,
+    MembersGraphQLSubscription,
+    TeamsGraphQLSubscription,
+);
 
 pub trait GraphQLSchema {
     fn graphql_api_schema(&self) -> Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
