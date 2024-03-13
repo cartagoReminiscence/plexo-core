@@ -1,10 +1,18 @@
 use crate::api::graphql::{commons::extract_context, resources::tasks::Task};
 use async_graphql::{Context, Object, Result, Subscription};
 
-use plexo_sdk::resources::tasks::{
-    extensions::{CreateTasksInput, TasksExtensionOperations},
-    operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
+use plexo_sdk::resources::{
+    changes::{
+        change::{ChangeOperation, ChangeResourceType},
+        operations::{ChangeCrudOperations, CreateChangeInputBuilder},
+    },
+    tasks::{
+        extensions::{CreateTasksInput, TasksExtensionOperations},
+        operations::{CreateTaskInput, GetTasksInput, TaskCrudOperations, UpdateTaskInput},
+    },
 };
+use serde_json::json;
+use tokio::task;
 use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -42,15 +50,43 @@ impl TasksGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
     async fn create_task(&self, ctx: &Context<'_>, input: CreateTaskInput) -> Result<Task> {
         let (core, member_id) = extract_context(ctx)?;
+        let saved_input = input.clone();
 
         let mut input = input;
         input.owner_id = member_id;
 
-        core.engine
-            .create_task(input)
-            .await
-            .map(|task| task.into())
-            .map_err(|err| err.into())
+        let task = core.engine.create_task(input).await?;
+        let saved_task = task.clone();
+
+        let input = saved_input.clone();
+        // let task = task.clone();
+        let engine = core.engine.clone();
+
+        task::spawn(async move {
+            let change = engine
+                .create_change(
+                    CreateChangeInputBuilder::default()
+                        .owner_id(task.owner_id)
+                        .resource_id(task.id)
+                        .operation(ChangeOperation::Create)
+                        .resource_type(ChangeResourceType::Task)
+                        .diff_json(
+                            serde_json::to_string(&json!({
+                                "input": input,
+                                "result": task,
+                            }))
+                            .unwrap(),
+                        )
+                        .build()
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+
+            println!("change registered: {} | {}", change.operation, change.resource_type);
+        });
+
+        Ok(saved_task.into())
     }
 
     async fn create_tasks(&self, ctx: &Context<'_>, input: CreateTasksInput) -> Result<Vec<Task>> {
