@@ -66,7 +66,7 @@ impl TasksGraphQLMutation {
             let change = engine
                 .create_change(
                     CreateChangeInputBuilder::default()
-                        .owner_id(task.owner_id)
+                        .owner_id(member_id)
                         .resource_id(task.id)
                         .operation(ChangeOperation::Create)
                         .resource_type(ChangeResourceType::Task)
