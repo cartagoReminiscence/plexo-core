@@ -1,11 +1,16 @@
-use crate::api::graphql::{commons::extract_context, resources::teams::Team};
+use crate::api::graphql::{
+    commons::{create_change, extract_context},
+    resources::teams::Team,
+};
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::resources::{
-    changes::change::{ChangeResourceType, ListenEvent},
+    changes::change::{ChangeOperation, ChangeResourceType, ListenEvent},
     teams::operations::{CreateTeamInput, GetTeamsInput, TeamCrudOperations, UpdateTeamInput},
 };
 
+use serde_json::json;
+use tokio::task;
 use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
@@ -47,31 +52,109 @@ impl TeamsGraphQLMutation {
         let mut input = input;
         input.owner_id = member_id;
 
-        core.engine
-            .create_team(input)
+        let saved_input = input.clone();
+
+        let team = core.engine.create_team(input).await?;
+        let saved_team = team.clone();
+
+        let input = saved_input.clone();
+
+        task::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                team.id,
+                ChangeOperation::Insert,
+                ChangeResourceType::Teams,
+                serde_json::to_string(&json!({
+                    "input": input,
+                    "result": team,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|team| team.into())
+            .unwrap();
+        });
+
+        Ok(saved_team.into())
+
+        // let (core, member_id) = extract_context(ctx)?;
+
+        // let mut input = input;
+        // input.owner_id = member_id;
+
+        // core.engine
+        //     .create_team(input)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|team| team.into())
     }
 
     async fn update_team(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTeamInput) -> Result<Team> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
-        core.engine
-            .update_team(id, input)
+        let saved_input = input.clone();
+
+        let team = core.engine.update_team(id, input).await?;
+
+        let team = team.clone();
+        let saved_team = team.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                team.id,
+                ChangeOperation::Update,
+                ChangeResourceType::Teams,
+                serde_json::to_string(&json!({
+                    "input": saved_input,
+                    "result": team,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|team| team.into())
+            .unwrap();
+        });
+
+        Ok(saved_team.into())
+
+        // core.engine
+        //     .update_team(id, input)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|team| team.into())
     }
 
     async fn delete_team(&self, ctx: &Context<'_>, id: Uuid) -> Result<Team> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_team(id)
+        let team = core.engine.delete_team(id).await?;
+        let saved_team = team.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                team.owner_id,
+                team.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Teams,
+                serde_json::to_string(&json!({
+                    "result": team,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|team| team.into())
+            .unwrap();
+        });
+
+        Ok(saved_team.into())
+
+        // core.engine
+        //     .delete_team(id)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|team| team.into())
     }
 }
 

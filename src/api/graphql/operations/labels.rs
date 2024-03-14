@@ -1,10 +1,15 @@
-use crate::api::graphql::{commons::extract_context, resources::labels::Label};
+use crate::api::graphql::{
+    commons::{create_change, extract_context},
+    resources::labels::Label,
+};
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::resources::{
-    changes::change::{ChangeResourceType, ListenEvent},
+    changes::change::{ChangeOperation, ChangeResourceType, ListenEvent},
     labels::operations::{CreateLabelInput, GetLabelsInput, LabelCrudOperations, UpdateLabelInput},
 };
+use serde_json::json;
+use tokio::task;
 use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
@@ -41,33 +46,91 @@ pub struct LabelsGraphQLMutation;
 impl LabelsGraphQLMutation {
     // TODO: It's possible that this method may not work correctly, as the owner_id is being ignored by async_graphql
     async fn create_label(&self, ctx: &Context<'_>, input: CreateLabelInput) -> Result<Label> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
-        core.engine
-            .create_label(input)
+        let mut input = input;
+        input.owner_id = member_id;
+
+        let saved_input = input.clone();
+
+        let label = core.engine.create_label(input).await?;
+        let saved_label = label.clone();
+
+        let input = saved_input.clone();
+
+        task::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                label.id,
+                ChangeOperation::Insert,
+                ChangeResourceType::Labels,
+                serde_json::to_string(&json!({
+                    "input": input,
+                    "result": label,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|label| label.into())
+            .unwrap();
+        });
+
+        Ok(saved_label.into())
     }
 
     async fn update_label(&self, ctx: &Context<'_>, id: Uuid, input: UpdateLabelInput) -> Result<Label> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
-        core.engine
-            .update_label(id, input)
+        let saved_input = input.clone();
+
+        let label = core.engine.update_label(id, input).await?;
+
+        let label = label.clone();
+        let saved_label = label.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                label.id,
+                ChangeOperation::Update,
+                ChangeResourceType::Labels,
+                serde_json::to_string(&json!({
+                    "input": saved_input,
+                    "result": label,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|label| label.into())
+            .unwrap();
+        });
+
+        Ok(saved_label.into())
     }
 
     async fn delete_label(&self, ctx: &Context<'_>, id: Uuid) -> Result<Label> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_label(id)
+        let label = core.engine.delete_label(id).await?;
+        let saved_label = label.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                label.owner_id,
+                label.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Labels,
+                serde_json::to_string(&json!({
+                    "result": label,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|label| label.into())
+            .unwrap();
+        });
+
+        Ok(saved_label.into())
     }
 }
 
