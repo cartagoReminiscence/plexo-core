@@ -77,17 +77,6 @@ impl ProjectsGraphQLMutation {
         });
 
         Ok(saved_project.into())
-
-        // let (core, member_id) = extract_context(ctx)?;
-
-        // let mut input = input;
-        // input.owner_id = member_id;
-
-        // core.engine
-        //     .create_project(input)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|project| project.into())
     }
 
     async fn update_project(&self, ctx: &Context<'_>, id: Uuid, input: UpdateProjectInput) -> Result<Project> {
@@ -121,7 +110,7 @@ impl ProjectsGraphQLMutation {
     }
 
     async fn delete_project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
         let project = core.engine.delete_project(id).await?;
         let saved_project = project.clone();
@@ -129,7 +118,7 @@ impl ProjectsGraphQLMutation {
         tokio::spawn(async move {
             create_change(
                 &core,
-                project.owner_id,
+                member_id,
                 project.id,
                 ChangeOperation::Delete,
                 ChangeResourceType::Projects,
@@ -143,12 +132,6 @@ impl ProjectsGraphQLMutation {
         });
 
         Ok(saved_project.into())
-
-        // core.engine
-        //     .delete_project(id)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|project| project.into())
     }
 }
 

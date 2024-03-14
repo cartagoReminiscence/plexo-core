@@ -77,17 +77,6 @@ impl TeamsGraphQLMutation {
         });
 
         Ok(saved_team.into())
-
-        // let (core, member_id) = extract_context(ctx)?;
-
-        // let mut input = input;
-        // input.owner_id = member_id;
-
-        // core.engine
-        //     .create_team(input)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|team| team.into())
     }
 
     async fn update_team(&self, ctx: &Context<'_>, id: Uuid, input: UpdateTeamInput) -> Result<Team> {
@@ -118,16 +107,10 @@ impl TeamsGraphQLMutation {
         });
 
         Ok(saved_team.into())
-
-        // core.engine
-        //     .update_team(id, input)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|team| team.into())
     }
 
     async fn delete_team(&self, ctx: &Context<'_>, id: Uuid) -> Result<Team> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
         let team = core.engine.delete_team(id).await?;
         let saved_team = team.clone();
@@ -135,7 +118,7 @@ impl TeamsGraphQLMutation {
         tokio::spawn(async move {
             create_change(
                 &core,
-                team.owner_id,
+                member_id,
                 team.id,
                 ChangeOperation::Delete,
                 ChangeResourceType::Teams,
@@ -149,12 +132,6 @@ impl TeamsGraphQLMutation {
         });
 
         Ok(saved_team.into())
-
-        // core.engine
-        //     .delete_team(id)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|team| team.into())
     }
 }
 

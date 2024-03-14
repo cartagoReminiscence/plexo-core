@@ -109,7 +109,7 @@ impl LabelsGraphQLMutation {
     }
 
     async fn delete_label(&self, ctx: &Context<'_>, id: Uuid) -> Result<Label> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
         let label = core.engine.delete_label(id).await?;
         let saved_label = label.clone();
@@ -117,7 +117,7 @@ impl LabelsGraphQLMutation {
         tokio::spawn(async move {
             create_change(
                 &core,
-                label.owner_id,
+                member_id,
                 label.id,
                 ChangeOperation::Delete,
                 ChangeResourceType::Labels,

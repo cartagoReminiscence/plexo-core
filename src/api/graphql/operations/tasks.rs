@@ -149,7 +149,7 @@ impl TasksGraphQLMutation {
     }
 
     async fn delete_task(&self, ctx: &Context<'_>, id: Uuid) -> Result<Task> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
         let task = core.engine.delete_task(id).await?;
         let saved_task = task.clone();
@@ -157,7 +157,7 @@ impl TasksGraphQLMutation {
         tokio::spawn(async move {
             create_change(
                 &core,
-                task.owner_id,
+                member_id,
                 task.id,
                 ChangeOperation::Delete,
                 ChangeResourceType::Tasks,

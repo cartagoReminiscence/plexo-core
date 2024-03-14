@@ -109,7 +109,7 @@ impl AssetsGraphQLMutation {
     }
 
     async fn delete_asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
         let asset = core.engine.delete_asset(id).await?;
         let saved_asset = asset.clone();
@@ -117,7 +117,7 @@ impl AssetsGraphQLMutation {
         tokio::spawn(async move {
             create_change(
                 &core,
-                asset.owner_id,
+                member_id,
                 asset.id,
                 ChangeOperation::Delete,
                 ChangeResourceType::Assets,
