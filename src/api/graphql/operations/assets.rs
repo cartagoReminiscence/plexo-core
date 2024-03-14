@@ -1,10 +1,15 @@
-use crate::api::graphql::{commons::extract_context, resources::assets::Asset};
+use crate::api::graphql::{
+    commons::{create_change, extract_context},
+    resources::assets::Asset,
+};
 use async_graphql::{Context, Object, Result, Subscription};
 
 use plexo_sdk::resources::{
     assets::operations::{AssetCrudOperations, CreateAssetInput, GetAssetsInput, UpdateAssetInput},
-    changes::change::{ChangeResourceType, ListenEvent},
+    changes::change::{ChangeOperation, ChangeResourceType, ListenEvent},
 };
+use serde_json::json;
+use tokio::task;
 use tokio_stream::{Stream, StreamExt};
 use uuid::Uuid;
 
@@ -46,21 +51,61 @@ impl AssetsGraphQLMutation {
         let mut input = input;
         input.owner_id = member_id;
 
-        core.engine
-            .create_asset(input)
+        let saved_input = input.clone();
+
+        let asset = core.engine.create_asset(input).await?;
+        let saved_asset = asset.clone();
+
+        let input = saved_input.clone();
+
+        task::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                asset.id,
+                ChangeOperation::Insert,
+                ChangeResourceType::Assets,
+                serde_json::to_string(&json!({
+                    "input": input,
+                    "result": asset,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|asset| asset.into())
+            .unwrap();
+        });
+
+        Ok(saved_asset.into())
     }
 
     async fn update_asset(&self, ctx: &Context<'_>, id: Uuid, input: UpdateAssetInput) -> Result<Asset> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
-        core.engine
-            .update_asset(id, input)
+        let saved_input = input.clone();
+
+        let asset = core.engine.update_asset(id, input).await?;
+
+        let asset = asset.clone();
+        let saved_asset = asset.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                asset.id,
+                ChangeOperation::Update,
+                ChangeResourceType::Assets,
+                serde_json::to_string(&json!({
+                    "input": saved_input,
+                    "result": asset,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|asset| asset.into())
+            .unwrap();
+        });
+
+        Ok(saved_asset.into())
     }
 
     async fn delete_asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {

@@ -1,7 +1,15 @@
-use crate::api::graphql::{commons::extract_context, resources::changes::Change};
+use crate::api::graphql::{
+    commons::{create_change, extract_context},
+    resources::changes::Change,
+};
 use async_graphql::{Context, Object, Result};
 
-use plexo_sdk::resources::changes::operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput};
+use plexo_sdk::resources::changes::{
+    change::{ChangeOperation, ChangeResourceType},
+    operations::{ChangeCrudOperations, CreateChangeInput, GetChangesInput, UpdateChangeInput},
+};
+use serde_json::json;
+use tokio::task;
 // use tokio_stream::Stream;
 use uuid::Uuid;
 
@@ -43,21 +51,72 @@ impl ChangesGraphQLMutation {
         let mut input = input;
         input.owner_id = member_id;
 
-        core.engine
-            .create_change(input)
+        let saved_input = input.clone();
+
+        let change = core.engine.create_change(input).await?;
+        let saved_change = change.clone();
+
+        let input = saved_input.clone();
+
+        task::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                change.id,
+                ChangeOperation::Insert,
+                ChangeResourceType::Changes,
+                serde_json::to_string(&json!({
+                    "input": input,
+                    "result": change,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|change| change.into())
+            .unwrap();
+        });
+
+        Ok(saved_change.into())
+
+        // let (core, member_id) = extract_context(ctx)?;
+
+        // let mut input = input;
+        // input.owner_id = member_id;
+
+        // core.engine
+        //     .create_change(input)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|change| change.into())
     }
 
     async fn update_change(&self, ctx: &Context<'_>, id: Uuid, input: UpdateChangeInput) -> Result<Change> {
-        let (core, _member_id) = extract_context(ctx)?;
+        let (core, member_id) = extract_context(ctx)?;
 
-        core.engine
-            .update_change(id, input)
+        let saved_input = input.clone();
+
+        let change = core.engine.update_change(id, input).await?;
+
+        let change = change.clone();
+        let saved_change = change.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                member_id,
+                change.id,
+                ChangeOperation::Update,
+                ChangeResourceType::Changes,
+                serde_json::to_string(&json!({
+                    "input": saved_input,
+                    "result": change,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|change| change.into())
+            .unwrap();
+        });
+
+        Ok(saved_change.into())
     }
 
     async fn delete_change(&self, ctx: &Context<'_>, id: Uuid) -> Result<Change> {
