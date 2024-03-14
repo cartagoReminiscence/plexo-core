@@ -51,42 +51,11 @@ impl ChangesGraphQLMutation {
         let mut input = input;
         input.owner_id = member_id;
 
-        let saved_input = input.clone();
-
-        let change = core.engine.create_change(input).await?;
-        let saved_change = change.clone();
-
-        let input = saved_input.clone();
-
-        task::spawn(async move {
-            create_change(
-                &core,
-                member_id,
-                change.id,
-                ChangeOperation::Insert,
-                ChangeResourceType::Changes,
-                serde_json::to_string(&json!({
-                    "input": input,
-                    "result": change,
-                }))
-                .unwrap(),
-            )
+        core.engine
+            .create_change(input)
             .await
-            .unwrap();
-        });
-
-        Ok(saved_change.into())
-
-        // let (core, member_id) = extract_context(ctx)?;
-
-        // let mut input = input;
-        // input.owner_id = member_id;
-
-        // core.engine
-        //     .create_change(input)
-        //     .await
-        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
-        //     .map(|change| change.into())
+            .map_err(|err| async_graphql::Error::new(err.to_string()))
+            .map(|change| change.into())
     }
 
     async fn update_change(&self, ctx: &Context<'_>, id: Uuid, input: UpdateChangeInput) -> Result<Change> {
