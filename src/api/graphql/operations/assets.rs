@@ -111,11 +111,26 @@ impl AssetsGraphQLMutation {
     async fn delete_asset(&self, ctx: &Context<'_>, id: Uuid) -> Result<Asset> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_asset(id)
+        let asset = core.engine.delete_asset(id).await?;
+        let saved_asset = asset.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                asset.owner_id,
+                asset.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Assets,
+                serde_json::to_string(&json!({
+                    "result": asset,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|asset| asset.into())
+            .unwrap();
+        });
+
+        Ok(saved_asset.into())
     }
 }
 

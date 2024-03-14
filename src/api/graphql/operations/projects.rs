@@ -123,11 +123,32 @@ impl ProjectsGraphQLMutation {
     async fn delete_project(&self, ctx: &Context<'_>, id: Uuid) -> Result<Project> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_project(id)
+        let project = core.engine.delete_project(id).await?;
+        let saved_project = project.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                project.owner_id,
+                project.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Projects,
+                serde_json::to_string(&json!({
+                    "result": project,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|project| project.into())
+            .unwrap();
+        });
+
+        Ok(saved_project.into())
+
+        // core.engine
+        //     .delete_project(id)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|project| project.into())
     }
 }
 

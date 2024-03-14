@@ -129,11 +129,32 @@ impl TeamsGraphQLMutation {
     async fn delete_team(&self, ctx: &Context<'_>, id: Uuid) -> Result<Team> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_team(id)
+        let team = core.engine.delete_team(id).await?;
+        let saved_team = team.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                team.owner_id,
+                team.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Teams,
+                serde_json::to_string(&json!({
+                    "result": team,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|team| team.into())
+            .unwrap();
+        });
+
+        Ok(saved_team.into())
+
+        // core.engine
+        //     .delete_team(id)
+        //     .await
+        //     .map_err(|err| async_graphql::Error::new(err.to_string()))
+        //     .map(|team| team.into())
     }
 }
 

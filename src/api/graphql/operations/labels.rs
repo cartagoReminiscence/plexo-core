@@ -111,11 +111,26 @@ impl LabelsGraphQLMutation {
     async fn delete_label(&self, ctx: &Context<'_>, id: Uuid) -> Result<Label> {
         let (core, _member_id) = extract_context(ctx)?;
 
-        core.engine
-            .delete_label(id)
+        let label = core.engine.delete_label(id).await?;
+        let saved_label = label.clone();
+
+        tokio::spawn(async move {
+            create_change(
+                &core,
+                label.owner_id,
+                label.id,
+                ChangeOperation::Delete,
+                ChangeResourceType::Labels,
+                serde_json::to_string(&json!({
+                    "result": label,
+                }))
+                .unwrap(),
+            )
             .await
-            .map_err(|err| async_graphql::Error::new(err.to_string()))
-            .map(|label| label.into())
+            .unwrap();
+        });
+
+        Ok(saved_label.into())
     }
 }
 
